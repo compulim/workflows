@@ -3,7 +3,7 @@ name: Publish release on push tag
 on:
   workflow_call:
     inputs:
-      package-name
+      package-name:
         required: true
         type: string
     outputs:
