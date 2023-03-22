@@ -6,15 +6,22 @@ on:
       package-name:
         required: true
         type: string
+    outputs:
+      npm-url:
+        value: ${{ jobs.publish-package.outputs.url }}
+      pages-url:
+        value: ${{ jobs.publish-pages.outputs.url }}
+      version:
+        value: ${{ jobs.build.outputs.version }}
 
 jobs:
   build:
+    outputs:
+      version: ${{ steps.set-version.outputs.version }}
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         node-version: [16.x]
-
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
@@ -53,10 +60,13 @@ jobs:
           path: packages/pages/public
 
   publish-package:
+    environment:
+      name: prerelease
+      url: ${{ steps.summary.outputs.url }}
     needs: build
+    outputs:
+      url: ${{ steps.summary.outputs.url }}
     runs-on: ubuntu-latest
-    environment: prerelease
-
     steps:
       - uses: actions/setup-node@v3
         with:
@@ -79,19 +89,23 @@ jobs:
       - run: npm publish --tag ${{ github.ref_name }} `ls *.tgz`
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Summarize job
-        run: echo NPM package published to https://npmjs.com/package/${{ steps.read-package-json.outputs.package-name }}/v/${{ steps.read-package-json.outputs.version }}. >> $GITHUB_STEP_SUMMARY
+      - id: summary
+        name: Summary
+        run: |
+          echo url=https://npmjs.com/package/${{ steps.read-package-json.outputs.package-name }}/v/${{ steps.read-package-json.outputs.version }} >> $GITHUB_OUTPUT
+          echo NPM package published to https://npmjs.com/package/${{ steps.read-package-json.outputs.package-name }}/v/${{ steps.read-package-json.outputs.version }}. >> $GITHUB_STEP_SUMMARY
 
   publish-pages:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     needs: build
+    outputs:
+      url: ${{ steps.deployment.outputs.page_url }}
     permissions:
       pages: write
       id-token: write
     runs-on: ubuntu-latest
-
     steps:
       - id: deployment
         name: Deploy to GitHub Pages
