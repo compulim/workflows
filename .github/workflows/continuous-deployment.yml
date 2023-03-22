@@ -3,6 +3,8 @@ name: Continuous deployment
 on:
   workflow_call:
     inputs:
+      dry-run:
+        type: boolean
       package-name:
         required: true
         type: string
@@ -86,9 +88,10 @@ jobs:
         run: |
           echo ::error::Cannot publish production version ${{ steps.read-package-json.outputs.version }}
           exit 1
-      - run: npm publish --tag ${{ github.ref_name }} `ls *.tgz`
-        env:
+      - env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        if: "!inputs.dry-run"
+        run: npm publish --tag ${{ github.ref_name }} `ls *.tgz`
       - id: summary
         name: Summary
         run: |
@@ -108,5 +111,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: deployment
+        if: "!inputs.dry-run"
         name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v2
