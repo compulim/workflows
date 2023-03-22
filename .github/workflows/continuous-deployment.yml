@@ -3,8 +3,6 @@ name: Continuous deployment
 on:
   workflow_call:
     inputs:
-      dry-run:
-        type: boolean
       package-name:
         required: true
         type: string
@@ -90,7 +88,6 @@ jobs:
           exit 1
       - env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        if: "!inputs.dry-run"
         run: npm publish --tag ${{ github.ref_name }} `ls *.tgz`
       - id: summary
         name: Summary
@@ -111,6 +108,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - id: deployment
-        if: "!inputs.dry-run"
         name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v2
