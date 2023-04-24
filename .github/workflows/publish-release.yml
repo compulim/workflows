@@ -18,10 +18,8 @@ on:
       version:
         value: ${{ jobs.build.outputs.version }}
     secrets:
-      GH_TOKEN:
-        required: true
-      NPM_TOKEN:
-        required: true
+      GH_TOKEN: {}
+      NPM_TOKEN: {}
 
 jobs:
   build:

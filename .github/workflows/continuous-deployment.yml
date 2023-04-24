@@ -14,8 +14,7 @@ on:
       version:
         value: ${{ jobs.build.outputs.version }}
     secrets:
-      NPM_TOKEN:
-        required: true
+      NPM_TOKEN: {}
 
 jobs:
   build:
