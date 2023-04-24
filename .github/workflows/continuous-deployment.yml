@@ -13,6 +13,9 @@ on:
         value: ${{ jobs.publish-pages.outputs.url }}
       version:
         value: ${{ jobs.build.outputs.version }}
+    secrets:
+      NPM_TOKEN:
+        required: true
 
 jobs:
   build:
