@@ -194,7 +194,7 @@ jobs:
         run: |
           if [ "${{ steps.create-pull-request.outputs.url }}" = "" ]; then
             echo url=https://github.com/${{ github.repository }}/compare/main...${{ steps.create-branch.outputs.branch-name }} >> $GITHUB_OUTPUT
-            echo "Branch created at [bump-${{ steps.bump-version.outputs.version }}](https://github.com/${{ github.repository }}/compare/main...${{ steps.create-branch.outputs.branch-name }})" >> $GITHUB_STEP_SUMMARY
+            echo "Branch created at [${{ steps.create-branch.outputs.branch-name }}](https://github.com/${{ github.repository }}/compare/main...${{ steps.create-branch.outputs.branch-name }})" >> $GITHUB_STEP_SUMMARY
           else
             echo url=${{ steps.create-pull-request.outputs.url }} >> $GITHUB_OUTPUT
             echo Pull request created at ${{ steps.create-pull-request.outputs.url }}. >> $GITHUB_STEP_SUMMARY
