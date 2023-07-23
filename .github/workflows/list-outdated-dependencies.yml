@@ -1,0 +1,24 @@
+name: List outdated dependencies
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  list-outdated:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Use Node.js 16
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+
+      - name: Audit packages
+        run: |
+          for i in `find . -name package.json ! -path */node_modules/* | xargs realpath | xargs dirname`; do echo --- $i/package.json ---; cd $i; npm audit; cd $OLDPWD; echo; done;
+
+      - name: List outdated packages
+        run: |
+          for i in `find . -name package.json ! -path */node_modules/* | xargs realpath | xargs dirname`; do echo --- $i/package.json ---; cd $i; npm outdated; cd $OLDPWD; echo; done;
