@@ -18,7 +18,7 @@ jobs:
 
       - name: Install packages
         run: |
-          for i in `find . -name package.json ! -path */node_modules/* | xargs realpath | xargs dirname`; do echo --- $i/package.json ---; cd $i; npm run prebump; npm install; npm run postbump; cd $OLDPWD; echo; done;
+          for i in `find . -name package.json ! -path */node_modules/* | xargs realpath | xargs dirname`; do echo --- $i/package.json ---; cd $i; npm run prebump --if-present; npm install; npm run postbump --if-present; cd $OLDPWD; echo; done;
 
       - name: Audit packages
         run: |
