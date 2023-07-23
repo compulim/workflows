@@ -1,0 +1,8 @@
+name: List outdated dependencies
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  call-workflow:
+    uses: compulim/workflows/.github/workflows/list-outdated-dependencies.yml@main
