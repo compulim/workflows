@@ -22,8 +22,8 @@ jobs:
 
       - name: Audit packages
         run: |
-          for i in `find . -name package.json ! -path */node_modules/* | xargs realpath | xargs dirname`; do echo --- $i/package.json ---; cd $i; npm audit; cd $OLDPWD; echo; done;
+          for i in `find . -name package.json ! -path */node_modules/* | xargs realpath | xargs dirname`; do echo --- $i/package.json ---; cd $i; npm audit || true; cd $OLDPWD; echo; done;
 
       - name: List outdated packages
         run: |
-          for i in `find . -name package.json ! -path */node_modules/* | xargs realpath | xargs dirname`; do echo --- $i/package.json ---; cd $i; npm outdated; cd $OLDPWD; echo; done;
+          for i in `find . -name package.json ! -path */node_modules/* | xargs realpath | xargs dirname`; do echo --- $i/package.json ---; cd $i; npm outdated || true; cd $OLDPWD; echo; done;
