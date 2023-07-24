@@ -66,9 +66,31 @@ jobs:
         with:
           path: packages/pages/public
 
+  extract-latest-changelog:
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download changelog artifact
+        uses: actions/download-artifact@v3.0.1
+        with:
+          name: changelog
+      - name: Install mdsplit
+        run: pip install mdsplit
+      - name: Extract CHANGELOG.md
+        run: mdsplit CHANGELOG.md --max-level 2
+      - name: Display latest version
+        run: cat "`ls CHANGELOG/**/[0-9]* -1 | tail -n 1`" > CHANGELOG.latest.md
+      - name: Append to changelog artifact
+        uses: actions/upload-artifact@v3.1.1
+        with:
+          name: changelog
+          path: CHANGELOG.latest.md
+
   draft-release:
     needs:
       - build
+      - extract-latest-changelog
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -82,7 +104,7 @@ jobs:
         with:
           name: tarball
       - name: Draft a new release
-        run: gh release create ${{ github.ref_name }} ./*.tgz --draft --notes-file ./CHANGELOG.md --repo ${{ github.repository }}
+        run: gh release create ${{ github.ref_name }} ./*.tgz --draft --notes-file ./CHANGELOG.latest.md --repo ${{ github.repository }}
         env:
           GH_TOKEN: ${{ github.token }}
 
