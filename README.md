@@ -40,8 +40,8 @@ This repository holds most reusable workflow for my own projects.
    - For this reason, it is recommended to add `%Y%m%d.%H%M%S` to the prerelease tag
 - Pack as tarball before publish
    - Upload tarball to artifacts as "evidence"
-   - Ability to verify tarball before publish
-   - Very clean publish
+   - Publish in another job without checkout
+   - Very clean and definitive publish
 
 ## Snippets
 
