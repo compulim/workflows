@@ -68,7 +68,7 @@ The outputs of the step will return `"true"` or `"false"`, and bailout if networ
     echo exist=$EXIST >> $GITHUB_OUTPUT
 ```
 
-In contrast,
+In contrast.
 
 ```sh
 echo abc=`jq -nr 'halt_error(1)'` # always return 0
