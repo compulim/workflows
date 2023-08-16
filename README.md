@@ -31,13 +31,16 @@ This repository holds most reusable workflow for my own projects.
    - Other jobs will download the "jobs" file and use it as source of truth
 - Inputs vs. environment variables
    - Inputs are auto-expanded for readability, preferred if it don't introduce too much complexity
-- `npm version 1.2.3-abc-0123` will change version to `1.2.3-abc-123`, leading zeroes in prerelease tags are removed
+- `npm version 1.2.3-abc.0123` will change version to `1.2.3-abc.123`, leading zeroes in prerelease tags may be removed
+   - `1.2.3-beta.00123` -> `1.2.3-beta.123` (segmented part are all numeric)
+   - `1.2.3-beta-00123` -> `1.2.3-beta-00123` (hyphens do not segment)
+   - `1.2.3-beta.00123abc` -> `1.2.3-beta.00123abc` (segmented part are not all numeric)
    - After `npm version 1.2.3-xyz`, read it again and use that version from that point of time
    - `npx semver` don't remove leading zeroes in prerelease tags
 - Semantic versioning will sort prerelease tags alphabetically and ignore build identifiers
    - `1.2.3-beta.1` > `1.2.3-beta.0`
    - `1.2.3-beta+1` ~= `1.2.3-beta+0`
-   - For this reason, it is recommended to add `%Y%m%d.%H%M%S` to the prerelease tag
+   - For this reason, it is recommended to add `%Y%m%d-%H%M%S` to the prerelease tag
 - Pack as tarball before publish
    - Upload tarball to artifacts as "evidence"
    - Publish in another job without checkout
