@@ -38,6 +38,10 @@ This repository holds most reusable workflow for my own projects.
    - `1.2.3-beta.1` > `1.2.3-beta.0`
    - `1.2.3-beta+1` ~= `1.2.3-beta+0`
    - For this reason, it is recommended to add `%Y%m%d.%H%M%S` to the prerelease tag
+- Pack as tarball before publish
+   - Upload tarball to artifacts as "evidence"
+   - Ability to verify tarball before publish
+   - Very clean publish
 
 ## Snippets
 
@@ -76,10 +80,12 @@ build-pages:
 
 ### Get latest commitish of current folder
 
-Set `actions/checkout@v3` with `fetch-depth: 0`.
+This will get the latest commitish of everything under the current folder. It is useful to know if anything changed under this folder.
+
+Set `actions/checkout@v3` with `fetch-depth: 0` to fetch all commits.
 
 ```sh
-COMMITTER_DATE=`git log --date=format:%Y%m%d.%H%M%S --pretty=format:'%cd' -1 ./$i/`
+COMMITTER_DATE=`git log --date=format:%Y%m%d.%H%M%S --pretty=format:'%cd' -1 ./`
 LONG_COMMITISH=`git log --pretty=format:'%H' -1 ./$i/`
 SHORT_COMMITISH=`git log --pretty=format:'%h' -1 ./$i/`
 ```
