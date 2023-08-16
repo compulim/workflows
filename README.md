@@ -63,7 +63,7 @@ The outputs of the step will return `"true"` or `"false"`, and bailout if networ
 - id: package-existence
   name: Check if package already present
   run: |
-    EXIST=`npm view ${{ steps.prepare.outputs.package-id }} --json 2>/dev/null | jq -r 'if .error then if .error.code == "E404" then false else halt_error(1) end else true end'` && true || exit 1
+    EXIST=`npm view my-package@1.2.3 --json 2>/dev/null | jq -r 'if .error then if .error.code == "E404" then false else halt_error(1) end else true end'` && true || exit 1
 
     echo exist=$EXIST >> $GITHUB_OUTPUT
 ```
