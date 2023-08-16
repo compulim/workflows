@@ -27,7 +27,9 @@ This repository holds most reusable workflow for my own projects.
    - Benefits: rerun failed builds/deployments
 - If you want to work with commits/tags
    - `actions/checkout@v3` with `fetch-depth: 0`
-- Reduce CD flakiness, do not run tests at continuous deployment
+- Eliminate CD workflow flakiness
+   - Continuous deployment workflow is unlikely to be monitored
+   - Do not run tests during continuous deployment
 - If inputs can be derived from repo
    - Build a prepare step and upload the "jobs" or "instructions" file
    - Other jobs will download the "jobs" file and use it as source of truth
