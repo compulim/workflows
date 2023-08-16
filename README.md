@@ -68,6 +68,12 @@ The outputs of the step will return `"true"` or `"false"`, and bailout if networ
     echo exist=$EXIST >> $GITHUB_OUTPUT
 ```
 
+In contrast,
+
+```sh
+echo abc=`jq -nr 'halt_error(1)'` # always return 0
+```
+
 ### Turns a GitHub Pages package into an artifact for `actions/upload-pages-artifact@v2`
 
 Build the `pages` package as part of `npm run build --workspaces`, then extract the tarball to use with `actions/upload-pages-artifact@v2` with all default settings.
