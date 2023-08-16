@@ -52,6 +52,8 @@ This repository holds most reusable workflow for my own projects.
 
 ### Checks if a package exists
 
+The outputs of the step will return `"true"` or `"false"`, and bailout if network or credentials error.
+
 ```yml
 - id: package-existence
   name: Check if package already present
@@ -62,6 +64,8 @@ This repository holds most reusable workflow for my own projects.
 ```
 
 ### Turns a GitHub Pages package into an artifact for `actions/upload-pages-artifact@v2`
+
+Build the `pages` package as part of `npm run build --workspaces`, then extract the tarball to use with `actions/upload-pages-artifact@v2` with all default settings.
 
 ```yml
 build-pages:
