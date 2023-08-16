@@ -17,6 +17,8 @@ This repository holds most reusable workflow for my own projects.
    - When you want to rerun the job, it is the place where you want to split jobs
    - One job, one thing to publish/deploy
    - Limiting permissions
+- Always think about job rerunnability
+   - Running `npm publish` twice will fail, should check if the package exists
 - Increase atomicity by following build-first-deploy-later model
    - Build everything and upload their artifacts first
    - Then, converge all jobs (`needs: [build-package, build-pages]`) into an approval job
