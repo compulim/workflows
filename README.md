@@ -7,7 +7,7 @@ This repository holds most reusable workflow for my own projects.
 - One step, one command
    - Do not put many commands into a single step, it's not easy to know which command failed the whole step
    - Exit code are checked only on the last command
-      - To quit sooner, `jq -r 'if .not.great then halt_error(1) end' && true || exit 1`
+      - To bailout, `jq -r 'if .not.great then halt_error(1) end' && true || exit 1`
    - Smaller steps limit exposure of token/env
 - Programmatically build matrix using [`fromJSON`](https://docs.github.com/en/actions/learn-github-actions/expressions#example-returning-a-json-object)
    - `echo matrix=jq -cnr '["package-1", "package-2"]' >> $GITHUB_OUTPUT`
