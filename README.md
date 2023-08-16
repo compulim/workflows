@@ -44,7 +44,7 @@ This repository holds most reusable workflow for my own projects.
 - Semantic versioning will sort prerelease tags alphabetically and ignore build identifiers
    - `1.2.3-beta.1` > `1.2.3-beta.0`
    - `1.2.3-beta+1` ~= `1.2.3-beta+0`
-   - For this reason, it is recommended to add `%Y%m%d-%H%M%S` to the prerelease tag
+   - If prerelease version is not committed to repo, it is recommended to add `main.%Y%m%d-%H%M%S.commitish` to the prerelease tag
 - Pack as tarball before publish
    - Upload tarball to artifacts as "evidence"
    - Publish in another job without checkout
