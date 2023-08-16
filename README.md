@@ -9,7 +9,7 @@ This repository holds most reusable workflow for my own projects.
    - Exit code are checked only on the last command
       - To bailout, `jq -r 'if .not.great then halt_error(1) end' && true || exit 1`
    - Smaller steps limit exposure of token/env
-- Programmatically build matrix using [`fromJSON`](https://docs.github.com/en/actions/learn-github-actions/expressions#example-returning-a-json-object)
+- Programmatically build [job matrix](https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs) using [`fromJSON`](https://docs.github.com/en/actions/learn-github-actions/expressions#example-returning-a-json-object)
    - `echo matrix=jq -cnr '["package-1", "package-2"]' >> $GITHUB_OUTPUT`
    - `matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}`
 - When should jobs be split
