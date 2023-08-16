@@ -92,7 +92,7 @@ build-pages:
     - name: Extract pages package
       run: |
         mkdir ./_site/
-        tar --extract --verbose --file=`ls -1 pages-[0-9]*.tgz` --strip-component=2 --directory=./_site/ package/public
+        tar --directory=./_site/ --extract --file=`ls -1 pages-[0-9]*.tgz` --strip-component=2 --verbose package/public
         ls -la ./_site/
     - name: Upload pages artifact
       uses: actions/upload-pages-artifact@v2
