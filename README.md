@@ -101,7 +101,7 @@ VERSION_SUFFIX=`git log --date=format:%Y%m%d-%H%M%S --pretty=format:'%cd.%h' -1 
 VERSION=`npx semver --increment prerelease -n false --preid $BRANCH.$VERSION_SUFFIX` # 0.0.0-main.20230816-084809.a1b2c3
 ```
 
-There is a bug in `npm@9.5.1` or `semver@7.5.4` that, after running `npm version`, the next run of `semver -n false` will still append `.0` to the prerelease tag.
+There is a bug in `npm@9.5.1` or `semver@7.5.4`. After running `npm version`, the next run of `semver -n false` will still append `.0` to the prerelease tag.
 
 ```sh
 npm version 1.2.3-alpha
