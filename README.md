@@ -106,8 +106,8 @@ Set `actions/checkout@v3` with `fetch-depth: 0` to fetch all commits.
 
 ```sh
 COMMITTER_DATE=`git log --date=format:%Y%m%d-%H%M%S --pretty=format:'%cd' -1 ./`
-LONG_COMMITISH=`git log --pretty=format:'%H' -1 ./$i/`
-SHORT_COMMITISH=`git log --pretty=format:'%h' -1 ./$i/`
+LONG_COMMITISH=`git log --pretty=format:'%H' -1 ./`
+SHORT_COMMITISH=`git log --pretty=format:'%h' -1 ./`
 ```
 
 To bump prerelease tag:
