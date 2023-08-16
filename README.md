@@ -88,7 +88,7 @@ This will get the latest commitish of everything under the current folder. It is
 Set `actions/checkout@v3` with `fetch-depth: 0` to fetch all commits.
 
 ```sh
-COMMITTER_DATE=`git log --date=format:%Y%m%d.%H%M%S --pretty=format:'%cd' -1 ./`
+COMMITTER_DATE=`git log --date=format:%Y%m%d-%H%M%S --pretty=format:'%cd' -1 ./`
 LONG_COMMITISH=`git log --pretty=format:'%H' -1 ./$i/`
 SHORT_COMMITISH=`git log --pretty=format:'%h' -1 ./$i/`
 ```
@@ -96,7 +96,9 @@ SHORT_COMMITISH=`git log --pretty=format:'%h' -1 ./$i/`
 To bump prerelease tag:
 
 ```sh
-VERSION=`npx semver --increment prerelease -n false --preid $BRANCH.$COMMITTER_DATE.$SHORT_COMMITISH`
+BRANCH=`git branch --show-current` # main
+VERSION_SUFFIX=`git log --date=format:%Y%m%d-%H%M%S --pretty=format:'%cd.%h' -1 ./` # 20230816-084809.a1b2c3
+VERSION=`npx semver --increment prerelease -n false --preid $BRANCH.$VERSION_SUFFIX` # 0.0.0-main.20230816-084809.a1b2c3
 ```
 
 There is a bug in `npm@9.5.1` or `semver@7.5.4` that, after running `npm version`, the next run of `semver -n false` will still append `.0` to the prerelease tag.
