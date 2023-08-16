@@ -47,6 +47,8 @@ This repository holds most reusable workflow for my own projects.
    - Upload tarball to artifacts as "evidence"
    - Publish in another job without checkout
    - Very clean and definitive publish
+- Don't replace release asset if not needed
+   - `gh release upload --clobber` is nice, but it will wipe out the upload time so no one know when it is being updated
 
 ## Snippets
 
