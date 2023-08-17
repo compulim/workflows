@@ -68,7 +68,7 @@ The outputs of the step will return `"true"` or `"false"`, and bailout if networ
     echo exist=$EXIST >> $GITHUB_OUTPUT
 ```
 
-In contrast.
+In contrast:
 
 ```sh
 echo abc=`jq -nr 'halt_error(1)'` # always return 0
@@ -98,7 +98,7 @@ build-pages:
       uses: actions/upload-pages-artifact@v2
 ```
 
-### Get latest commitish of current folder
+### Gets latest commitish of current folder
 
 This will get the latest commitish of everything under the current folder. It is useful to know if anything changed under this folder.
 
