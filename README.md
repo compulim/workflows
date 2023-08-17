@@ -52,6 +52,7 @@ This repository holds most reusable workflow for my own projects.
 - Don't overwrite release asset
    - `gh release upload --clobber` is nice for job rerun, but it will wipe out the upload time so no one know when it is being updated
 - Consider how workflow run when forked, they will run with no settings/secrets
+- Every job must have at least 1 step
 
 ## Snippets
 
