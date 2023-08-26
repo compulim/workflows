@@ -58,6 +58,8 @@ This repository holds most reusable workflow for my own projects.
 - For debuggability, uses `echo abc=123 | tee --append $GITHUB_OUTPUT`, instead of `echo abc=123 >> $GITHUB_OUTPUT`
    - Only use `>> $GITHUB_OUTPUT` for secrets
    - Note that `tee` will always exit with 0
+- When using `bash`, always set `shell: bash`
+   - It will use `set -eo pipefail`, otherwise, it's `set -e`
 
 ## Snippets
 
