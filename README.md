@@ -6,8 +6,6 @@ This repository holds most reusable workflow for my own projects.
 
 - One step, one command
    - Do not put many commands into a single step, it's not easy to know which command failed the whole step
-   - Exit code are checked only on the last command
-      - To bailout, `jq -r 'if .not.great then halt_error(1) end' && true || exit 1`
    - Smaller steps limit exposure of token/env
 - Programmatically build [job matrix](https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs) using [`fromJSON`](https://docs.github.com/en/actions/learn-github-actions/expressions#example-returning-a-json-object)
    - `echo matrix=jq -cnr '["package-1", "package-2"]' >> $GITHUB_OUTPUT`
@@ -57,7 +55,7 @@ This repository holds most reusable workflow for my own projects.
 - Every job must have at least 1 step
 - For debuggability, uses `echo abc=123 | tee --append $GITHUB_OUTPUT`, instead of `echo abc=123 >> $GITHUB_OUTPUT`
    - Only use `>> $GITHUB_OUTPUT` for secrets
-   - Note that `tee` will always exit with 0
+   - Note that `tee` will always exit with 0, should use `set -eo pipefail` to fail early
 - When using `bash`, always set `shell: bash`
    - It will use `set -eo pipefail`, otherwise, it's `set -e`
 
