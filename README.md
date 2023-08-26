@@ -63,6 +63,7 @@ This repository holds most reusable workflow for my own projects.
       - When CD is on `push` event instead of `workflow_dispatch`, it does not have `workflow: write` permission
       - It will almost certainly fail until we run the CD once manually
    - `git pull --all` will always say we have a conflict
+- `xargs` not easily working on Windows because CRLF
 
 ## Snippets
 
