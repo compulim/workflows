@@ -52,12 +52,17 @@ This repository holds most reusable workflow for my own projects.
 - Don't overwrite release asset
    - `gh release upload --clobber` is nice for job rerun, but it will wipe out the upload time so no one know when it is being updated
 - Consider how workflow run when forked, they will run with no settings/secrets
-- Every job must have at least 1 step
+- GitHub mandates every job must have at least 1 step
 - For debuggability, uses `echo abc=123 | tee --append $GITHUB_OUTPUT`, instead of `echo abc=123 >> $GITHUB_OUTPUT`
    - Only use `>> $GITHUB_OUTPUT` for secrets
    - Note that `tee` will always exit with 0, should use `set -eo pipefail` to fail early
 - When using `bash`, always set `shell: bash`
    - It will use `set -eo pipefail`, otherwise, it's `set -e`
+- CD should not release to `release/vnext`
+   - GitHub workflow permission issues
+      - When CD is on `push` event instead of `workflow_dispatch`, it does not have `workflow: write` permission
+      - It will almost certainly fail until we run the CD once manually
+   - `git pull --all` will always say we have a conflict
 
 ## Snippets
 
