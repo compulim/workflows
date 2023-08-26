@@ -64,6 +64,10 @@ This repository holds most reusable workflow for my own projects.
       - It will almost certainly fail until we run the CD once manually
    - `git pull --all` will always say we have a conflict
 - `xargs` not easily working on Windows because CRLF
+- Windows using actions with `path: /tmp/...`, then reading files in `bash`
+   - Actions may run on Windows natively, writing to `D:\`
+   - Latter `bash` will not be able to access those files
+   - Better with `path: ./tmp/...` so it write to source folder, which is accessible across OS
 
 ## Snippets
 
