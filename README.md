@@ -29,9 +29,9 @@ This repository holds most reusable workflow for my own projects.
    - Continuous deployment workflow is unlikely to be monitored
    - Do not run tests during continuous deployment
 - If inputs can be derived from repo
-   - Build a prepare step and prepare the inputs as `strategy.matrix.include`
+   - Build a prepare step and prepare the inputs as `strategy.matrix`
    - Other jobs will
-     - Use the matrix as `strategy.matrix.include: ${{ fromJSON(needs.prepare.outputs.matrix) }}`
+     - Use the matrix as `strategy.matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}`
      - Use the input as `echo The input is ${{ matrix.input-value }}`
 - Inputs vs. environment variables
    - Inputs are auto-expanded for readability, preferred if it don't introduce too much complexity
