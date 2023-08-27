@@ -75,6 +75,7 @@ This repository holds most reusable workflow for my own projects.
    - Don't use `-` because it is difficult to use in `bash`
    - Uppercase for things from environment/exports
    - Lowercase for things in current shell
+- Use `$(< some-file.txt)` than `` `cat some-file.txt` ``
 
 ## Snippets
 
