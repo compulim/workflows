@@ -68,6 +68,8 @@ This repository holds most reusable workflow for my own projects.
    - Actions may run on Windows natively, writing to `D:\`
    - Latter `bash` will not be able to access those files
    - Better with `path: ./tmp/...` so it write to source folder, which is accessible across OS
+- `actions/checkout` will remove files that are in `.gitignore`
+   - Run `actions/checkout` as early as possible
 
 ## Snippets
 
