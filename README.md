@@ -92,6 +92,31 @@ $ cat filenames.txt | jq -nR 'reduce inputs as $i ([]; . + [$i])' | tee filename
 ]
 ```
 
+### Merge two arrays together
+
+Given `names.json` and `versions.json` are two JSON arrays of strings.
+
+```sh
+jq -n --argfile names names.json --argfile versions versions.json '($names | to_entries) + ($versions | to_entries) | group_by(.key) | map({ name: .[0].value, version: .[1].value })'
+```
+
+```json
+[
+  {
+    "name": "abc",
+    "version": "1.2.3"
+  },
+  {
+    "name": "def",
+    "version": "2.3.4"
+  },
+  {
+    "name": "xyz",
+    "version": "7.8.9"
+  }
+]
+```
+
 ### Checks if a package exists
 
 The outputs of the step will return `"true"` or `"false"`, and bailout if network or credentials error.
