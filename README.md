@@ -71,6 +71,25 @@ This repository holds most reusable workflow for my own projects.
 
 ## Snippets
 
+### Turns a multiline plain text file into JSON array
+
+```sh
+cat filenames.txt | jq -nR 'reduce inputs as $i ([]; . + [$i])' | tee filenames.json
+```
+
+```sh
+$ cat filenames.txt
+abc.txt
+def.txt
+xyz.txt
+$ cat filenames.txt | jq -nR 'reduce inputs as $i ([]; . + [$i])' | tee filenames.json
+[
+  "abc.txt",
+  "def.txt",
+  "xyz.txt"
+]
+```
+
 ### Checks if a package exists
 
 The outputs of the step will return `"true"` or `"false"`, and bailout if network or credentials error.
