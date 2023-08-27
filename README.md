@@ -71,6 +71,10 @@ This repository holds most reusable workflow for my own projects.
    - Better with `path: ./tmp/...` so it write to source folder, which is accessible across OS
 - `actions/checkout` will remove files that are in `.gitignore`
    - Run `actions/checkout` as early as possible
+- Shell naming convention
+   - Don't use `-` because it is difficult to use in `bash`
+   - Uppercase for things from environment/exports
+   - Lowercase for things in current shell
 
 ## Snippets
 
