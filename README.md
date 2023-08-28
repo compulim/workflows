@@ -77,6 +77,7 @@ This repository holds most reusable workflow for my own projects.
    - Lowercase for things in current shell
 - Use `$(< some-file.txt)` than `` `cat some-file.txt` ``
 - To use `bash` for-loop to loop through an array, `for i in $(cat file.json | jq -cr '.[]')`
+- Don't use `if: ${{ true }}`, it will be always true, use `if: true` instead
 
 ## Snippets
 
