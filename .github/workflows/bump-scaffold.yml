@@ -75,9 +75,15 @@ jobs:
 
           for i in $(find -type f)
           do
+            echo --- $i
+
             sed -- 's/$package-name/${{ inputs.package-name }}/g' $i | tee /tmp/output.tmp
+            mv /tmp/output.tmp $i
+
             sed -- 's/$use-react/${{ inputs.use-react }}/g' $i | tee /tmp/output.tmp
             mv /tmp/output.tmp $i
+
+            echo
           done
 
       - name: Copy scaffold
@@ -91,8 +97,12 @@ jobs:
 
           for i in $(find **/*.json -type f)
           do
+            echo --- $i
+
             cat ../../../current/$i | jq --argfile merge $i '. + $merge' | tee /tmp/temp.json
             mv /tmp/temp.json ../../../current/$i
+
+            echo
           done
 
       - name: Remove React in Babel config
@@ -104,8 +114,12 @@ jobs:
 
           for i in $(ls -1 babel.*.json)
           do
+            echo --- $i
+
             cat $i | jq -r '. | (.presets | map(select(. != "@babel/preset-react")))' | tee /tmp/output.tmp
             mv /tmp/output.tmp $i
+
+            echo
           done
 
       - name: Update configuration files
