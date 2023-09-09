@@ -116,7 +116,7 @@ jobs:
           do
             echo --- $i
 
-            cat $i | jq -r '. | (.presets | map(select(. != "@babel/preset-react")))' | tee /tmp/output.tmp
+            cat $i | jq -r '. | (if .presets then .presets |= map(select((. == "@babel/preset-react" or (. | type == "array" and .[0] == "@babel/preset-react") | not))) else . end)' | tee /tmp/output.tmp
             mv /tmp/output.tmp $i
 
             echo
