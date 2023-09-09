@@ -31,7 +31,6 @@ jobs:
       - name: 'Sanity check: must from https://registry.npmjs.org/'
         run: cat package-lock.json | jq '.dependencies + .packages | to_entries | map(.value.resolved // "" | select((. == "" or startswith("https://registry.npmjs.org/")) | not)) | if length > 0 then halt_error(1) else empty end'
       - run: npm clean-install
-      - run: npm run precommit --if-present
       - run: npm run build --if-present
       - name: Run npm pack
         run: |
@@ -49,6 +48,8 @@ jobs:
           npm run precommit --if-present
           npm run build
           npm run test --if-present
+      # Only run precommit after pages is built, because we hand-install tarball.
+      - run: npm run precommit --if-present
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v1
         with:
