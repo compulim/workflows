@@ -84,7 +84,26 @@ jobs:
             sed -- 's/$package-name/${{ inputs.package-name }}/g' $i | tee /tmp/output.tmp
             mv /tmp/output.tmp $i
 
+            sed -- 's/$skip-integration-test/${{ inputs.skip-integration-test }}/g' $i | tee /tmp/output.tmp
+            mv /tmp/output.tmp $i
+
             sed -- 's/$use-react/${{ inputs.use-react }}/g' $i | tee /tmp/output.tmp
+            mv /tmp/output.tmp $i
+            echo
+          done
+
+      - name: Remove React in Babel config
+        if: '!inputs.use-react'
+        run: |
+          cd ./template/scaffold/copy/packages/${{ inputs.package-name }}/
+
+          # Remove @babel/preset-react from babel.config.json/presets
+
+          for i in $(ls -1 babel.*.json)
+          do
+            echo --- $i
+
+            cat $i | jq -r '. | (if .presets then .presets |= map(select((. == "@babel/preset-react" or (. | type == "array" and .[0] == "@babel/preset-react") | not))) else . end)' | tee /tmp/output.tmp
             mv /tmp/output.tmp $i
 
             echo
@@ -105,23 +124,6 @@ jobs:
 
             cat ../../../current/$i | jq --argfile merge $i '. + $merge' | tee /tmp/temp.json
             mv /tmp/temp.json ../../../current/$i
-
-            echo
-          done
-
-      - name: Remove React in Babel config
-        if: '!inputs.use-react'
-        run: |
-          cd ./template/scaffold/copy/packages/${{ inputs.package-name }}/
-
-          # Remove @babel/preset-react from babel.config.json/presets
-
-          for i in $(ls -1 babel.*.json)
-          do
-            echo --- $i
-
-            cat $i | jq -r '. | (if .presets then .presets |= map(select((. == "@babel/preset-react" or (. | type == "array" and .[0] == "@babel/preset-react") | not))) else . end)' | tee /tmp/output.tmp
-            mv /tmp/output.tmp $i
 
             echo
           done
