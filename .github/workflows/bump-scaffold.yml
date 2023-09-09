@@ -63,17 +63,17 @@ jobs:
 
           for i in `ls -1 *.yml`
           do
-            sed -- 's/$package-name/${{ inputs.component-name }}/g' $i | tee /tmp/$i
+            sed -- 's/$package-name/${{ inputs.package-name }}/g' $i | tee /tmp/$i
             mv /tmp/$i .
           done
 
       - name: Update package name for /packages
         run: |
           cd ./template/scaffold/copy/packages/
-          mv $package-name ${{ inputs.component-name }}
+          mv $package-name ${{ inputs.package-name }}
 
           cd ../../merge/packages
-          mv $package-name ${{ inputs.component-name }}
+          mv $package-name ${{ inputs.package-name }}
 
       - name: Copy scaffold files
         run: rsync --recursive --verbose ./template/scaffold/copy/ ./current/
