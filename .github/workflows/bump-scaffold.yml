@@ -18,7 +18,6 @@ on:
       use-react:
         default: true
         description: Use React
-        required: true
         type: boolean
 
 defaults:
