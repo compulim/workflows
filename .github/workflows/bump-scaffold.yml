@@ -15,6 +15,11 @@ on:
         description: Name of the package
         required: true
         type: string
+      use-react:
+        default: true
+        description: Use React
+        required: true
+        type: boolean
 
 defaults:
   run:
@@ -69,7 +74,7 @@ jobs:
         run: |
           cd ./template/scaffold/
 
-          for i in `find -type f`
+          for i in $(find -type f)
           do
             sed -- 's/$package-name/${{ inputs.package-name }}/g' $i | tee /tmp/output.tmp
             mv /tmp/output.tmp $i
@@ -84,10 +89,23 @@ jobs:
 
           cd ./template/scaffold/merge/
 
-          for i in `find **/*.json -type f`
+          for i in $(find **/*.json -type f)
           do
             cat ../../../current/$i | jq --argfile merge $i '. + $merge' | tee /tmp/temp.json
             mv /tmp/temp.json ../../../current/$i
+          done
+
+      - name: Remove React in Babel config
+        if: '!inputs.use-react'
+        run: |
+          cd ./template/scaffold/packages/${{ inputs.package-name }}/
+
+          # Remove @babel/preset-react from babel.config.json/presets
+
+          for i in $(ls -1 babel.*.json)
+          do
+            cat $i | jq -r '. | (.presets | map(select(. != "@babel/preset-react")))' | tee /tmp/output.tmp
+            mv /tmp/output.tmp $i
           done
 
       - name: Update configuration files
@@ -104,7 +122,7 @@ jobs:
           git status
           git ls-files --deleted --exclude-from=./.gitignore --modified --others
 
-          if [[ `git ls-files --deleted --exclude-from=./.gitignore --modified --others | wc -l` -gt 0 ]]
+          if [[ $(git ls-files --deleted --exclude-from=./.gitignore --modified --others | wc -l) -gt 0 ]]
           then
             echo has-changes=true >> $GITHUB_OUTPUT
           fi
@@ -135,7 +153,7 @@ jobs:
         run: |
           cd ./current
 
-          URL=`gh pr create --fill --repo ${{ github.repository }} || true` >> $GITHUB_OUTPUT
+          URL=$(gh pr create --fill --repo ${{ github.repository }} || true) >> $GITHUB_OUTPUT
 
           if [[ ! -z "$URL" ]]
           then
