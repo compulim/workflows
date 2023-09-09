@@ -10,6 +10,10 @@ on:
         required: false
         type: boolean
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -24,6 +28,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
+      - name: 'Sanity check: must from https://registry.npmjs.org/'
+        run: cat package-lock.json | jq '.dependencies + .packages | to_entries | map(.value.resolved // "" | select((. == "" or startswith("https://registry.npmjs.org/")) | not)) | if length > 0 then halt_error(1) else empty end'
       - run: npm clean-install
       - name: Run ESLint
         run: npm run precommit
@@ -62,29 +68,27 @@ jobs:
           name: tarball
       - name: Extract tarball to root
         run: tar -xvf ${{ inputs.package-name }}-*.tgz --strip-components=1
-      - name: "Sanity check: has LICENSE"
+      - name: 'Sanity check: has LICENSE'
         run: compgen -G LICENSE
-      - name: "Sanity check: has README.md"
+      - name: 'Sanity check: has README.md'
         run: compgen -G README.md
-      - name: "Sanity check: main exists"
+      - name: 'Sanity check: main exists'
         run: cat package.json | jq -r '.main' | xargs -L1 test -f $1
-      - name: "Sanity check: typings exists"
+      - name: 'Sanity check: typings exists'
         run: cat package.json | jq -r '.types // .typings' | xargs -L1 test -f $1
-      - name: "Sanity check: all exports exists"
+      - name: 'Sanity check: all exports exists'
         run: cat package.json | jq '(.exports | paths) as $p | .exports | getpath($p) | if . | type == "string" then . else empty end' | xargs -L1 test -f $1
-      - name: "Sanity check: has source maps"
+      - name: 'Sanity check: has source maps'
         run: compgen -G lib/**/*.js.map
-      - name: "Sanity check: no lib/**/*.spec.*"
-        run: "! compgen -G lib/**/*.spec.*"
-      - name: "Sanity check: no lib/**/*.test.*"
-        run: "! compgen -G lib/**/*.test.*"
-      - name: "Sanity check: no production dependencies are pre-release"
+      - name: 'Sanity check: no lib/**/*.spec.*'
+        run: '! compgen -G lib/**/*.spec.*'
+      - name: 'Sanity check: no lib/**/*.test.*'
+        run: '! compgen -G lib/**/*.test.*'
+      - name: 'Sanity check: no production dependencies are pre-release'
         run: cat package.json | jq '.dependencies | to_entries | map(.value | select(contains("-"))) | if length > 0 then halt_error(1) else empty end'
-      - name: "Sanity check: must from https://registry.npmjs.org/"
-        run: cat package-lock.json | jq '.dependencies + .packages | to_entries | map(.value.resolved // "" | select((. == "" or startswith("https://registry.npmjs.org/")) | not)) | if length > 0 then halt_error(1) else empty end'
 
   integration-test:
-    if: "!inputs.skip-integration-test"
+    if: '!inputs.skip-integration-test'
     needs: build
     runs-on: ubuntu-latest
 

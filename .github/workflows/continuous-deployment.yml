@@ -16,6 +16,10 @@ on:
     secrets:
       NPM_TOKEN: {}
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   build:
     outputs:

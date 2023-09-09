@@ -13,6 +13,10 @@ on:
       GH_TOKEN: {}
       NPM_TOKEN: {}
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   create-bump-pull-request:
     continue-on-error: true
