@@ -84,7 +84,7 @@ jobs:
 
           for i in `find -type f`
           do
-            cat ../../current/$i | jq --argfile merge $i '. + $i' | tee /tmp/$i
+            cat ../../current/$i | jq --argfile merge $i '. + $merge' | tee /tmp/$i
             mv /tmp/$i ../../current/$i
           done
 
