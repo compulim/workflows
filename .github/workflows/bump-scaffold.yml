@@ -9,10 +9,10 @@ name: Bump scaffold
 #   - workflows: write
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
-      component-name:
-        description: Name of the component
+      package-name:
+        description: Name of the package
         required: true
         type: string
 
