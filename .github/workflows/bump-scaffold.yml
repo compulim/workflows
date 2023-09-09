@@ -75,6 +75,12 @@ jobs:
           cd ../../merge/packages
           mv \$package-name ${{ inputs.package-name }}
 
+      - name: Update package name for /package.json
+        run: |
+          cd ./template/scaffold/merge/
+          sed -- 's/$package-name/${{ inputs.package-name }}/g' $i | tee /tmp/package.json
+          mv /tmp/package.json ./package.json
+
       - name: Copy scaffold files
         run: rsync --recursive --verbose ./template/scaffold/copy/ ./current/
 
