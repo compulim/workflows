@@ -57,17 +57,7 @@ jobs:
           git checkout -b $BRANCH_NAME
           echo branch-name=$BRANCH_NAME >> $GITHUB_OUTPUT
 
-      - name: Update package name for /.github/workflows
-        run: |
-          cd ./template/scaffold/copy/.github/workflows
-
-          for i in `ls -1 *.yml`
-          do
-            sed -- 's/$package-name/${{ inputs.package-name }}/g' $i | tee /tmp/$i
-            mv /tmp/$i .
-          done
-
-      - name: Update package name for /packages
+      - name: Update directory name
         run: |
           cd ./template/scaffold/copy/packages/
           mv \$package-name ${{ inputs.package-name }}
@@ -75,30 +65,35 @@ jobs:
           cd ../../merge/packages
           mv \$package-name ${{ inputs.package-name }}
 
-      - name: Update package name for /package.json
+      - name: Update content
+        run: |
+          cd ./template/scaffold/
+
+          for i in `find -type f`
+          do
+            sed -- 's/$package-name/${{ inputs.package-name }}/g' $i | tee /tmp/output.tmp
+            mv /tmp/output.tmp $i
+          done
+
+      - name: Copy scaffold
+        run: rsync --recursive --verbose ./template/scaffold/copy/ ./current/
+
+      - name: Merge JSON
         run: |
           shopt -s globstar
 
           cd ./template/scaffold/merge/
 
-          for i in `find **/package.json -type f`
-          do
-            sed -- 's/$package-name/${{ inputs.package-name }}/g' $i | tee /tmp/temp.json
-            mv /tmp/temp.json $i
-          done
-
-      - name: Copy scaffold files
-        run: rsync --recursive --verbose ./template/scaffold/copy/ ./current/
-
-      - name: Merge scaffold files
-        run: |
-          cd ./template/scaffold/merge/
-
-          for i in `find -type f`
+          for i in `find **/*.json -type f`
           do
             cat ../../../current/$i | jq --argfile merge $i '. + $merge' | tee /tmp/temp.json
             mv /tmp/temp.json ../../../current/$i
           done
+
+      - name: Update configuration files
+        run: |
+          cd ./current/packages/${{ inputs.package-name }}/
+          npm run bump:babel
 
       - id: get-changes
         name: Get changes
