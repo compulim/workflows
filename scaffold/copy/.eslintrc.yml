@@ -37,7 +37,3 @@ rules:
       caughtErrorsIgnorePattern: ^_
       destructuredArrayIgnorePattern: ^_
       varsIgnorePattern: ^_
-
-settings:
-  react:
-    version: '16.8'
