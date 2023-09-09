@@ -77,9 +77,15 @@ jobs:
 
       - name: Update package name for /package.json
         run: |
+          shopt -s globstar
+
           cd ./template/scaffold/merge/
-          sed -- 's/$package-name/${{ inputs.package-name }}/g' $i | tee /tmp/package.json
-          mv /tmp/package.json ./package.json
+
+          for i in `find **/package.json -type f`
+          do
+            sed -- 's/$package-name/${{ inputs.package-name }}/g' $i | tee /tmp/temp.json
+            mv /tmp/temp.json $i
+          done
 
       - name: Copy scaffold files
         run: rsync --recursive --verbose ./template/scaffold/copy/ ./current/
