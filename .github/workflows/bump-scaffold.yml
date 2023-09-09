@@ -93,6 +93,7 @@ jobs:
       - name: Update configuration files
         run: |
           cd ./current/packages/${{ inputs.package-name }}/
+          npm clean-install
           npm run bump:babel
 
       - id: get-changes
