@@ -103,11 +103,11 @@ jobs:
       - name: Isolate integration test
         run: |
           mv ./repo/packages/integration-test/ ./
+          rm -r ./repo
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
       - name: Download tarball artifact
         uses: actions/download-artifact@v3.0.1
         with:
