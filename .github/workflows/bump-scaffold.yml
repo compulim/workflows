@@ -19,6 +19,10 @@ on:
         default: true
         description: Use React
         type: boolean
+      skip-integration-test:
+        default: false
+        description: Skip integration test
+        type: boolean
 
 defaults:
   run:
