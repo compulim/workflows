@@ -43,7 +43,7 @@ jobs:
             cd $i
             npm audit | tee --append $GITHUB_STEP_SUMMARY || true
             cd $OLDPWD
-            echo
+            echo | tee --append $GITHUB_STEP_SUMMARY
           done
 
           echo \`\`\` | tee --append $GITHUB_STEP_SUMMARY
@@ -57,7 +57,7 @@ jobs:
             cd $i
             npm outdated | tee --append $GITHUB_STEP_SUMMARY || true
             cd $OLDPWD
-            echo
+            echo | tee --append $GITHUB_STEP_SUMMARY
           done
 
           echo \`\`\` | tee --append $GITHUB_STEP_SUMMARY
