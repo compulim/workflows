@@ -59,7 +59,7 @@ jobs:
 
       - name: Update package name for /.github/workflows
         run: |
-          cd ./template/copy/.github/workflows
+          cd ./template/scaffold/copy/.github/workflows
 
           for i in `ls -1 *.yml`
           do
@@ -69,18 +69,18 @@ jobs:
 
       - name: Update package name for /packages
         run: |
-          cd ./template/copy/packages/
+          cd ./template/scaffold/copy/packages/
           mv $package-name ${{ inputs.component-name }}
 
           cd ../../merge/packages
           mv $package-name ${{ inputs.component-name }}
 
       - name: Copy scaffold files
-        run: rsync --recursive --verbose ./template/copy/ ./current/
+        run: rsync --recursive --verbose ./template/scaffold/copy/ ./current/
 
       - name: Merge scaffold files
         run: |
-          cd ./template/merge/
+          cd ./template/scaffold/merge/
 
           for i in `find -type f`
           do
