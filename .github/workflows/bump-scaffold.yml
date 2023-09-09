@@ -57,7 +57,7 @@ jobs:
           git checkout -b $BRANCH_NAME
           echo branch-name=$BRANCH_NAME >> $GITHUB_OUTPUT
 
-      - id: Update package name for /.github/workflows
+      - name: Update package name for /.github/workflows
         run: |
           cd ./template/copy/.github/workflows
 
@@ -67,7 +67,7 @@ jobs:
             mv /tmp/$i .
           done
 
-      - id: Update package name for /packages
+      - name: Update package name for /packages
         run: |
           cd ./template/copy/packages/
           mv $package-name ${{ inputs.component-name }}
