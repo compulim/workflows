@@ -110,7 +110,8 @@ jobs:
 
       - name: Update configuration files
         run: |
-          cd ./current/packages/${{ inputs.package-name }}/
+          cd ./current/
+
           npm clean-install
           npm run postscaffold
 
