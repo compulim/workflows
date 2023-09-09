@@ -45,7 +45,7 @@ jobs:
         id: create-branch
         run: |
           BRANCH_NAME=bump-${{ github.run_id }}
-          echo branch-name=$BRANCH_NAME >> $GITHUB_OUTPUT
+          echo branch-name=$BRANCH_NAME | tee --append $GITHUB_OUTPUT
 
           git checkout -b $BRANCH_NAME
           git add --all
@@ -59,14 +59,14 @@ jobs:
         run: |
           PULL_REQUEST_NUMBER=`gh api repos/${{ github.repository }}/pulls --field base=main --field head=${{ steps.create-branch.outputs.branch-name }} --field title="Bump dependencies" | jq -r '.number'`
           gh api repos/${{ github.repository }}/issues/$PULL_REQUEST_NUMBER/assignees --field assignees[]=${{ github.actor }}
-          echo url=https://github.com/${{ github.repository }}/pull/$PULL_REQUEST_NUMBER >> $GITHUB_OUTPUT
+          echo url=https://github.com/${{ github.repository }}/pull/$PULL_REQUEST_NUMBER | tee --append $GITHUB_OUTPUT
       - id: summary
         name: Summary
         run: |
           if [ "${{ steps.create-pull-request.outputs.url }}" = "" ]; then
-            echo url=https://github.com/${{ github.repository }}/compare/main...${{ steps.create-branch.outputs.branch-name }} >> $GITHUB_OUTPUT
-            echo "Branch created at [${{ steps.create-branch.outputs.branch-name }}](https://github.com/${{ github.repository }}/compare/main...${{ steps.create-branch.outputs.branch-name }})" >> $GITHUB_STEP_SUMMARY
+            echo url=https://github.com/${{ github.repository }}/compare/main...${{ steps.create-branch.outputs.branch-name }} | tee --append $GITHUB_OUTPUT
+            echo "Branch created at [${{ steps.create-branch.outputs.branch-name }}](https://github.com/${{ github.repository }}/compare/main...${{ steps.create-branch.outputs.branch-name }})" | tee --append $GITHUB_STEP_SUMMARY
           else
-            echo url=${{ steps.create-pull-request.outputs.url }} >> $GITHUB_OUTPUT
-            echo Pull request created at ${{ steps.create-pull-request.outputs.url }}. >> $GITHUB_STEP_SUMMARY
+            echo url=${{ steps.create-pull-request.outputs.url }} | tee --append $GITHUB_OUTPUT
+            echo Pull request created at ${{ steps.create-pull-request.outputs.url }}. | tee --append $GITHUB_STEP_SUMMARY
           fi
