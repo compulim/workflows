@@ -33,9 +33,8 @@ jobs:
       - run: npm clean-install
       - run: npm run build --if-present
       - name: Run npm pack
-        run: |
-          cd packages/${{ inputs.package-name }}
-          npm pack
+        run: npm pack
+        working-directory: packages/${{ inputs.package-name }}
       - name: Upload tarball artifact
         uses: actions/upload-artifact@v3.1.1
         with:
@@ -43,11 +42,11 @@ jobs:
           path: packages/${{ inputs.package-name }}/*.tgz
       - name: Build and test pages
         run: |
-          cd packages/pages
           npm install
           npm run precommit --if-present
           npm run build
           npm run test --if-present
+        working-directory: packages/pages
       # Only run precommit after pages is built, because we hand-install tarball.
       - run: npm run precommit --if-present
       - name: Upload pages artifact
@@ -55,9 +54,8 @@ jobs:
         with:
           path: packages/pages/public
       - name: Run unit tests
-        run: |
-          cd packages/${{ inputs.package-name }}
-          npm test
+        run: npm test
+        working-directory: packages/${{ inputs.package-name }}
 
   sanity-check:
     needs: build
@@ -100,6 +98,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          path: ./repo
+      - name: Isolate integration test
+        run: |
+          mv ./repo/packages/integration-test/ ./
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
@@ -109,12 +112,10 @@ jobs:
         uses: actions/download-artifact@v3.0.1
         with:
           name: tarball
-          path: packages/${{ inputs.package-name }}
+          path: ./integration-test/
       - name: Run npm install
-        run: |
-          cd packages/integration-test
-          npm install
+        run: npm install *.tgz
+        working-directory: integration-test
       - name: Run integration tests
-        run: |
-          cd packages/integration-test
-          npm test
+        run: npm test
+        working-directory: integration-test
