@@ -11,5 +11,5 @@
     "postscaffold:eslint:react": "npm run bump:eslintrc",
     "precommit": "npm run precommit --if-present --workspaces",
     "test": "npm run test --if-present --workspaces"
-  },
+  }
 }
