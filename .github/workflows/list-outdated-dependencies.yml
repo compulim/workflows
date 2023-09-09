@@ -35,21 +35,29 @@ jobs:
 
       - name: Audit packages
         run: |
+          echo \`\`\` | tee --append $GITHUB_STEP_SUMMARY
+
           for i in `find . -name package.json ! -path */node_modules/* | xargs realpath | xargs dirname`
           do
             echo --- $i/package.json --- | tee --append $GITHUB_STEP_SUMMARY
             cd $i
-            npm audit || true | tee --append $GITHUB_STEP_SUMMARY
+            npm audit | tee --append $GITHUB_STEP_SUMMARY || true
             cd $OLDPWD
             echo
           done
 
+          echo \`\`\` | tee --append $GITHUB_STEP_SUMMARY
+
       - name: List outdated packages
         run: |
+          echo \`\`\` | tee --append $GITHUB_STEP_SUMMARY
+
           for i in `find . -name package.json ! -path */node_modules/* | xargs realpath | xargs dirname`
           do echo --- $i/package.json --- | tee --append $GITHUB_STEP_SUMMARY
             cd $i
-            npm outdated || true | tee --append $GITHUB_STEP_SUMMARY
+            npm outdated | tee --append $GITHUB_STEP_SUMMARY || true
             cd $OLDPWD
             echo
           done
+
+          echo \`\`\` | tee --append $GITHUB_STEP_SUMMARY
