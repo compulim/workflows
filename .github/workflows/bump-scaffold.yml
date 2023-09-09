@@ -70,10 +70,10 @@ jobs:
       - name: Update package name for /packages
         run: |
           cd ./template/scaffold/copy/packages/
-          mv $package-name ${{ inputs.package-name }}
+          mv \$package-name ${{ inputs.package-name }}
 
           cd ../../merge/packages
-          mv $package-name ${{ inputs.package-name }}
+          mv \$package-name ${{ inputs.package-name }}
 
       - name: Copy scaffold files
         run: rsync --recursive --verbose ./template/scaffold/copy/ ./current/
