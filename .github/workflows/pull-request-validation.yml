@@ -71,7 +71,7 @@ jobs:
       - name: "Sanity check: typings exists"
         run: cat package.json | jq -r '.types // .typings' | xargs -L1 test -f $1
       - name: "Sanity check: all exports exists"
-        run: cat package.json | jq '.exports | map(flatten) | flatten | .[]' | xargs -L1 test -f $1
+        run: cat package.json | jq '(.exports | paths) as $p | .exports | getpath($p) | if . | type == "string" then . else empty end' | xargs -L1 test -f $1
       - name: "Sanity check: has source maps"
         run: compgen -G lib/**/*.js.map
       - name: "Sanity check: no lib/**/*.spec.*"
