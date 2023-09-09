@@ -108,7 +108,7 @@ jobs:
       - name: Remove React in Babel config
         if: '!inputs.use-react'
         run: |
-          cd ./template/scaffold/packages/${{ inputs.package-name }}/
+          cd ./template/scaffold/copy/packages/${{ inputs.package-name }}/
 
           # Remove @babel/preset-react from babel.config.json/presets
 
