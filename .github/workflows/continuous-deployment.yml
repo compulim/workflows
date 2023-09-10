@@ -41,15 +41,12 @@ jobs:
           npx version-from-git --no-git-tag-version
           echo version=`cat package.json | jq -r '.version'` | tee --append $GITHUB_OUTPUT
       - name: Propagate versions
-        run: |
-          cd packages/${{ inputs.package-name }}
-          npm version --no-git-tag-version ${{ steps.set-version.outputs.version }}
+        run: npm version --no-git-tag-version --workspace=${{ inputs.package-name }} ${{ steps.set-version.outputs.version }}
       - run: npm clean-install
       - run: npm run build --if-present
       - name: Run npm pack
-        run: |
-          cd packages/${{ inputs.package-name }}
-          npm pack
+        run: npm pack
+        working-directory: packages/${{ inputs.package-name }}
       - name: Upload tarball artifact
         uses: actions/upload-artifact@v3.1.1
         with:
@@ -57,9 +54,9 @@ jobs:
           path: packages/${{ inputs.package-name }}/*.tgz
       - name: Build pages
         run: |
-          cd packages/pages
           npm install ../${{ inputs.package-name }}/*.tgz
           npm run build
+        working-directory: packages/pages
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v1
         with:
