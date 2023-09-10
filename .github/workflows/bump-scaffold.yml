@@ -61,9 +61,9 @@ jobs:
         run: |
           BRANCH_NAME=bot/bump-scaffold/${{ github.run_number }}
 
-          cd ./current/
           git checkout -b $BRANCH_NAME
           echo branch-name=$BRANCH_NAME >> $GITHUB_OUTPUT
+        working-directory: ./current/
 
       - name: Update directory name
         run: |
@@ -75,8 +75,6 @@ jobs:
 
       - name: Update content
         run: |
-          cd ./template/scaffold/
-
           for i in $(find -type f)
           do
             echo --- $i
@@ -91,12 +89,11 @@ jobs:
             mv /tmp/output.tmp $i
             echo
           done
+        working-directory: ./template/scaffold/
 
       - name: Remove React in Babel config
         if: '!inputs.use-react'
         run: |
-          cd ./template/scaffold/copy/packages/${{ inputs.package-name }}/
-
           # Remove @babel/preset-react from babel.config.json/presets
 
           for i in $(ls -1 babel.*.json)
@@ -108,6 +105,7 @@ jobs:
 
             echo
           done
+        working-directory: ./template/scaffold/copy/packages/${{ inputs.package-name }}/
 
       - name: Copy scaffold
         run: rsync --recursive --verbose ./template/scaffold/copy/ ./current/
@@ -115,8 +113,6 @@ jobs:
       - name: Merge JSON
         run: |
           shopt -s globstar
-
-          cd ./template/scaffold/merge/
 
           for i in $(find **/*.json -type f)
           do
@@ -130,34 +126,31 @@ jobs:
 
             echo
           done
+        working-directory: ./template/scaffold/merge/
 
       - continue-on-error: true
         name: Update configuration files
         run: |
-          cd ./current/
-
           npm clean-install
           npm run postscaffold
+        working-directory: ./current
 
       - id: get-changes
         name: Get changes
         run: |
-          cd ./current/
-
           git status
           git ls-files --deleted --exclude-from=./.gitignore --modified --others
 
           if [[ $(git ls-files --deleted --exclude-from=./.gitignore --modified --others | wc -l) -gt 0 ]]
           then
-            echo has-changes=true >> $GITHUB_OUTPUT
+            echo has-changes=true | tee --append $GITHUB_OUTPUT
           fi
+        working-directory: ./current
 
       - id: commit-and-push
-        if: ${{ steps.get-changes.outputs.has-changes == 'true' }}
+        if: steps.get-changes.outputs.has-changes == 'true'
         name: Commit and push
         run: |
-          cd ./current
-
           git config user.email "${{ github.actor }}@users.noreply.github.com"
           git config user.name "@${{ github.actor }}"
 
@@ -169,15 +162,14 @@ jobs:
           echo url=$URL >> $GITHUB_OUTPUT
 
           echo Branch created at [\`${{ steps.create-branch.outputs.branch-name }}\`]\($URL\). >> $GITHUB_STEP_SUMMARY
+        working-directory: ./current
 
       - env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         id: create-pull-request
-        if: ${{ steps.get-changes.outputs.has-changes == 'true' }}
+        if: steps.get-changes.outputs.has-changes == 'true'
         name: Create pull request
         run: |
-          cd ./current
-
           URL=$(gh pr create --fill --repo ${{ github.repository }} || true) >> $GITHUB_OUTPUT
 
           if [[ ! -z "$URL" ]]
@@ -185,8 +177,9 @@ jobs:
             echo url=$URL >> $GITHUB_OUTPUT
             echo Pull request created at $URL. >> $GITHUB_STEP_SUMMARY
           fi
+        working-directory: ./current
 
       - id: summary
-        if: ${{ steps.get-changes.outputs.has-changes == 'true' }}
+        if: steps.get-changes.outputs.has-changes == 'true'
         name: Summary
         run: echo url=${{ steps.create-pull-request.outputs.url || steps.commit-and-push.outputs.url }} >> $GITHUB_OUTPUT
