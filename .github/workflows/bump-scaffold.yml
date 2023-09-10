@@ -131,12 +131,13 @@ jobs:
             echo
           done
 
-      - name: Update configuration files
+      - continue-on-error: true
+        name: Update configuration files
         run: |
           cd ./current/
 
           npm clean-install
-          npm run postscaffold || true
+          npm run postscaffold
 
       - id: get-changes
         name: Get changes
