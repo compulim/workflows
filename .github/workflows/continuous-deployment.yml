@@ -40,8 +40,12 @@ jobs:
         run: |
           npx version-from-git --no-git-tag-version
           echo version=`cat package.json | jq -r '.version'` | tee --append $GITHUB_OUTPUT
+      - name: Uninstall current version
+        run: npm uninstall --workspaces ${{ inputs.package-name }}
+      - name: Update version
+        run: npm version --no-git-tag-version --no-workspaces-update --workspace=${{ inputs.package-name }} ${{ steps.set-version.outputs.version }}
       - name: Propagate versions
-        run: npm version --no-git-tag-version --workspace=${{ inputs.package-name }} ${{ steps.set-version.outputs.version }}
+        run: npm install --workspaces ${{ inputs.package-name }}@${{ steps.set-version.outputs.version }}
       - run: npm clean-install
       - run: npm run build --if-present
       - name: Run npm pack
