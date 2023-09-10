@@ -139,9 +139,9 @@ jobs:
         name: Get changes
         run: |
           git status
-          git ls-files --deleted --exclude-from=./.gitignore --modified --others
+          git ls-files --deleted --exclude-standard --modified --others
 
-          if [[ $(git ls-files --deleted --exclude-from=./.gitignore --modified --others | wc -l) -gt 0 ]]
+          if [[ $(git ls-files --deleted --exclude-standard --modified --others | wc -l) -gt 0 ]]
           then
             echo has-changes=true | tee --append $GITHUB_OUTPUT
           fi
