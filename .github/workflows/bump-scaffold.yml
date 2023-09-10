@@ -136,7 +136,7 @@ jobs:
           cd ./current/
 
           npm clean-install
-          npm run postscaffold
+          npm run postscaffold || true
 
       - id: get-changes
         name: Get changes
