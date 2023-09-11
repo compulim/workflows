@@ -17,6 +17,9 @@ defaults:
   run:
     shell: bash
 
+env:
+  node-version: 18.x
+
 jobs:
   create-bump-pull-request:
     continue-on-error: true
@@ -34,10 +37,10 @@ jobs:
         run: |
           git config user.email "${{ format('@{0}', github.actor) }}"
           git config user.name "${{ format('@{0}', github.actor) }}"
-      - name: Use Node.js 16
+      - name: Use Node.js ${{ env.node-version }}
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: ${{ env.node-version }}
           cache: 'npm'
       - run: npm clean-install
       - run: npm run bump

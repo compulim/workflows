@@ -8,16 +8,19 @@ defaults:
   run:
     shell: bash
 
+env:
+  node-version: 18.x
+
 jobs:
   list-outdated:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
-      - name: Use Node.js 16
+      - name: Use Node.js ${{ env.node-version }}
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: ${{ env.node-version }}
           cache: 'npm'
 
       - name: Install packages

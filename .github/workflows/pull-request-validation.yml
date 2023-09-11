@@ -14,19 +14,19 @@ defaults:
   run:
     shell: bash
 
+env:
+  node-version: 18.x
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [16.x]
 
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js ${{ env.node-version }}
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: ${{ env.node-version }}
           cache: 'npm'
       - name: 'Sanity check: must from https://registry.npmjs.org/'
         run: cat ./package-lock.json | jq '.packages | with_entries(select(.value.link | not)) | with_entries(select(.value.resolved != null)) | with_entries(select(.value.resolved | startswith("https://registry.npmjs.org/") | not)) | if length > 0 then halt_error(1) else empty end'
@@ -92,10 +92,6 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [16.x]
-
     steps:
       - uses: actions/checkout@v3
         with:
@@ -104,10 +100,10 @@ jobs:
         run: |
           mv ./repo/packages/integration-test/ ./
           rm -r ./repo
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js ${{ env.node-version }}
         uses: actions/setup-node@v3
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: ${{ env.node-version }}
       - name: Download tarball artifact
         uses: actions/download-artifact@v3.0.1
         with:
