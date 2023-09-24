@@ -69,8 +69,3 @@ jobs:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         name: Assign pull request ${{ steps.pull-request.outputs.pull-request-number }} to ${{ github.actor }}
         run: gh api repos/${{ github.repository }}/issues/${{ steps.pull-request.outputs.pull-request-number }}/assignees --field assignees[]=${{ github.actor }}
-      - continue-on-error: true
-        env:
-          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
-        name: Add label "bot" to pull request ${{ steps.pull-request.outputs.pull-request-number }}
-        run: gh api repos/${{ github.repository }}/issues/${{ steps.pull-request.outputs.pull-request-number }}/labels --field labels[]=bot
