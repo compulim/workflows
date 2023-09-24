@@ -122,10 +122,10 @@ jobs:
       - upload-changelog
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-        with:
-          # Must use PAT to checkout, otherwise, it will not trigger "release created" event.
-          token: ${{ secrets.GH_TOKEN }}
+      # - uses: actions/checkout@v3
+      #   with:
+      #     # Must use PAT to checkout, otherwise, it will not trigger "release created" event.
+      #     token: ${{ secrets.GH_TOKEN }}
       - name: Download changelog artifact
         uses: actions/download-artifact@v3.0.1
         with:
