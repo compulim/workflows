@@ -76,7 +76,7 @@ jobs:
       - name: Extract CHANGELOG.md
         run: mdsplit CHANGELOG.md --max-level 2
       - name: Display latest version
-        run: cat $(ls ./CHANGELOG/**/[0-9]* -1 | tail -n 1) | tee ./CHANGELOG.latest.md
+        run: cat "$(ls ./CHANGELOG/**/[0-9]* -1 | tail -n 1)" | tee ./CHANGELOG.latest.md
       - name: Upload changelog
         uses: actions/upload-artifact@v3.1.1
         with:
