@@ -6,9 +6,6 @@ on:
       package-name:
         required: true
         type: string
-    outputs:
-      version:
-        value: ${{ jobs.build.outputs.version }}
 
 defaults:
   run:
@@ -88,7 +85,7 @@ jobs:
       name: npm-prerelease
       url: https://npmjs.com/package/${{ steps.package-json.outputs.package-name }}/v/${{ steps.package-json.outputs.version }}
     if: needs.build.outputs.version-type != 'production'
-    name: Publish to NPM as prerelease
+    name: Publish to NPM prerelease
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -136,24 +133,28 @@ jobs:
         uses: actions/download-artifact@v3.0.1
         with:
           name: tarball
-      # Creating release using `gh release create` don't trigger workflow.
-      # - env:
-      #     GH_TOKEN: ${{ steps.generate-token.outputs.token }}
-      #   name: Create release
-      #   run: gh release create v${{ needs.build.outputs.version }} *.tgz --notes-file ./CHANGELOG.latest.md --repo ${{ github.repository }} --target ${{ github.ref }}
       - env:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         id: release
         name: Create release
         run: |
-          gh api repos/${{ github.repository }}/releases \
-            --method POST \
-            --header "Accept: application/vnd.github+json" \
-            --header "X-GitHub-Api-Version: 2022-11-28" \
-            --field tag_name='v${{ needs.build.outputs.version }}' \
-            --field target_commitish='${{ github.ref }}' \
-            --field name='v${{ needs.build.outputs.version }}' | tee /tmp/output.json
-          echo tag=$(cat /tmp/output.json | jq -r .tag_name) | tee --append $GITHUB_OUTPUT
+          TAG=v${{ needs.build.outputs.version }}
+          gh release create $TAG --repo ${{ github.repository }} --target ${{ github.ref }}
+
+          echo tag=$TAG | tee --append $GITHUB_OUTPUT
+      # - env:
+      #     GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+      #   id: release
+      #   name: Create release
+      #   run: |
+      #     gh api repos/${{ github.repository }}/releases \
+      #       --method POST \
+      #       --header "Accept: application/vnd.github+json" \
+      #       --header "X-GitHub-Api-Version: 2022-11-28" \
+      #       --field tag_name='v${{ needs.build.outputs.version }}' \
+      #       --field target_commitish='${{ github.ref }}' \
+      #       --field name='v${{ needs.build.outputs.version }}' | tee /tmp/output.json
+      #     echo tag=$(cat /tmp/output.json | jq -r .tag_name) | tee --append $GITHUB_OUTPUT
       - env:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         name: Add release notes
