@@ -32,6 +32,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         name: Download assets
         run: gh release download ${{ inputs.tag }} --repo ${{ github.repository }}
+      - name: "Sanity check: only one package to publish"
+        run: '[[ $(ls -1 ./*.tgz | wc -l) == 1 ]]'
       - id: package-json
         name: Read package.json
         run: |
@@ -39,7 +41,9 @@ jobs:
 
           echo package-name=$(cat /tmp/package.json | jq -r .name) | tee --append $GITHUB_OUTPUT
           echo version=$(cat /tmp/package.json | jq -r .version) | tee --append $GITHUB_OUTPUT
-      - name: 'Sanity check: must not prerelease'
+      - name: 'Sanity check: must package name of "${{ inputs.package-name }}"'
+        run: '[[ "${{ steps.package-json.outputs.package-name }}" == "${{ inputs.package-name }}" ]]'
+      - name: 'Sanity check: must not be prerelease'
         run: '[[ "${{ steps.package-json.outputs.version }}" != *-* ]]'
       # - env:
       #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
