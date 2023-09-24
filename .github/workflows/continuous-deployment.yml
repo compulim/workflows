@@ -113,7 +113,7 @@ jobs:
 
   publish-release:
     environment:
-      name: admin
+      name: workflow-bot
       url: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ needs.build.outputs.version }}
     if: needs.build.outputs.version-type == 'production'
     name: Publish release
@@ -122,8 +122,9 @@ jobs:
       - upload-changelog
     runs-on: ubuntu-latest
     steps:
-      - uses: tibdex/github-app-token@v1
-        id: generate-token
+      - id: generate-token
+        name: Generate workflow-bot token
+        uses: compulim/tibdex-github-app-token@v2.1.0
         with:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.APP_PRIVATE_KEY }}
