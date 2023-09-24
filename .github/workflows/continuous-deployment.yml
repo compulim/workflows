@@ -111,42 +111,42 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --tag ${{ github.ref_name }} `ls *.tgz`
 
-  publish-tag:
-    if: needs.build.outputs.version-type == 'production'
-    name: Publish tag
-    needs: build
-    outputs:
-      tag: ${{ steps.tag.outputs.tag }}
-    permissions:
-      contents: write
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Configure user profile
-        run: |
-          git config user.email "${{ format('@{0}', github.actor) }}"
-          git config user.name "${{ format('@{0}', github.actor) }}"
-      - id: tag
-        name: Create tag
-        run: |
-          TAG=v${{ needs.build.outputs.version }}
-          git tag --annotate --message "${{ needs.build.outputs.version }} Release" $TAG
+  # publish-tag:
+  #   if: needs.build.outputs.version-type == 'production'
+  #   name: Publish tag
+  #   needs: build
+  #   outputs:
+  #     tag: ${{ steps.tag.outputs.tag }}
+  #   permissions:
+  #     contents: write
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: Configure user profile
+  #       run: |
+  #         git config user.email "${{ format('@{0}', github.actor) }}"
+  #         git config user.name "${{ format('@{0}', github.actor) }}"
+  #     - id: tag
+  #       name: Create tag
+  #       run: |
+  #         TAG=v${{ needs.build.outputs.version }}
+  #         git tag --annotate --message "${{ needs.build.outputs.version }} Release" $TAG
 
-          echo tag=$TAG | tee --append $GITHUB_OUTPUT
-      - name: Push tag
-        run: git push --set-upstream origin ${{ steps.tag.outputs.tag }}
+  #         echo tag=$TAG | tee --append $GITHUB_OUTPUT
+  #     - name: Push tag
+  #       run: git push --set-upstream origin ${{ steps.tag.outputs.tag }}
 
   publish-release:
     environment:
       name: admin
-      url: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ needs.publish-tag.outputs.tag }}
+      url: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ needs.build.outputs.version }}
     if: needs.build.outputs.version-type == 'production'
     name: Publish release
     needs:
-      - publish-tag
       - upload-changelog
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Download changelog artifact
         uses: actions/download-artifact@v3.0.1
         with:
@@ -158,7 +158,7 @@ jobs:
       - env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         name: Create release
-        run: gh release create ${{ needs.publish-tag.outputs.tag }} *.tgz --notes-file ./CHANGELOG.latest.md --repo ${{ github.repository }}
+        run: gh release create v${{ needs.build.outputs.version }} *.tgz --notes-file ./CHANGELOG.latest.md --repo ${{ github.repository }} --target ${{ github.ref }}
 
   publish-pages:
     environment:
