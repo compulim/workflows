@@ -44,7 +44,6 @@ jobs:
       #   run: npm publish `ls ./*.tgz`
 
   create-pull-request:
-    continue-on-error: true
     environment:
       name: workflow-bot
       url: ${{ github.server_url }}/${{ github.repository }}/pull/${{ steps.pull-request.outputs.pull-request-number }}
