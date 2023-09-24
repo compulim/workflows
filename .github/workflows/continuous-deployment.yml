@@ -66,7 +66,24 @@ jobs:
         with:
           path: packages/pages/public
 
-  publish-prerelease-package:
+  upload-changelog:
+    name: Upload changelog
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install mdsplit
+        run: pip install mdsplit
+      - name: Extract CHANGELOG.md
+        run: mdsplit CHANGELOG.md --max-level 2
+      - name: Display latest version
+        run: cat $(ls ./CHANGELOG/**/[0-9]* -1 | tail -n 1) | tee ./CHANGELOG.latest.md
+      - name: Upload changelog
+        uses: actions/upload-artifact@v3.1.1
+        with:
+          name: changelog
+          path: ./CHANGELOG.latest.md
+
+  publish-npm:
     environment:
       name: prerelease
       url: ${{ steps.summary.outputs.url }}
@@ -90,29 +107,26 @@ jobs:
           echo version=`tar --extract --file=\`ls ./*.tgz\` --to-stdout package/package.json | jq -r .version` | tee --append $GITHUB_OUTPUT
       - name: 'Sanity check: version must be prerelease'
         run: '[[ "$(cat ./package.json | jq -r ''.version'')" == *-0 ]]'
-      # Temporarily disable publish
-      # - env:
-      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      #   run: npm publish --tag ${{ github.ref_name }} `ls *.tgz`
+      - env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --tag ${{ github.ref_name }} `ls *.tgz`
       - id: summary
         name: Summary
         run: |
           echo url=https://npmjs.com/package/${{ steps.read-package-json.outputs.package-name }}/v/${{ steps.read-package-json.outputs.version }} | tee --append $GITHUB_OUTPUT
           echo NPM package published to https://npmjs.com/package/${{ steps.read-package-json.outputs.package-name }}/v/${{ steps.read-package-json.outputs.version }}. | tee --append $GITHUB_STEP_SUMMARY
 
-  publish-release:
+  publish-tag:
     if: needs.build.outputs.version-type == 'production'
-    name: Publish to GitHub Release
+    name: Publish tag
     needs: build
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
     permissions:
       contents: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Download tarball artifact
-        uses: actions/download-artifact@v3.0.1
-        with:
-          name: tarball
       - name: Configure user profile
         run: |
           git config user.email "${{ format('@{0}', github.actor) }}"
@@ -126,14 +140,27 @@ jobs:
           echo tag=$TAG_NAME | tee --append $GITHUB_OUTPUT
       - name: Push tag
         run: git push --set-upstream origin ${{ steps.tag.outputs.tag }}
+
+  publish-release:
+    if: needs.build.outputs.version-type == 'production'
+    name: Publish release
+    needs:
+      - publish-tag
+      - upload-changelog
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download changelog artifact
+        uses: actions/download-artifact@v3.0.1
+        with:
+          name: changelog
+      - name: Download tarball artifact
+        uses: actions/download-artifact@v3.0.1
+        with:
+          name: tarball
       - env:
           GH_TOKEN: ${{ github.token }}
         name: Create release
-        run: gh release create ${{ steps.tag.outputs.tag }}
-      - env:
-          GH_TOKEN: ${{ github.token }}
-        name: Upload asset
-        run: gh release upload ${{ steps.tag.outputs.tag }} *.tgz
+        run: gh release create ${{ needs.publish-tag.outputs.tag }} *.tgz --notes-file ./CHANGELOG.latest.md --repo ${{ github.repository }}
 
   # Temporarily disable publish
   # publish-pages:
