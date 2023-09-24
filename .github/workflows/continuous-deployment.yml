@@ -162,18 +162,17 @@ jobs:
         name: Create release
         run: gh release create ${{ needs.publish-tag.outputs.tag }} *.tgz --notes-file ./CHANGELOG.latest.md --repo ${{ github.repository }}
 
-  # Temporarily disable publish
-  # publish-pages:
-  #   environment:
-  #     name: github-pages
-  #     url: ${{ steps.deployment.outputs.page_url }}
-  #   name: Publish to GitHub Pages
-  #   needs: build
-  #   permissions:
-  #     pages: write
-  #     id-token: write
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - id: deployment
-  #       name: Deploy to GitHub Pages
-  #       uses: actions/deploy-pages@v2
+  publish-pages:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    name: Publish to GitHub Pages
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - id: deployment
+        name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v2
