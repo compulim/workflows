@@ -83,12 +83,12 @@ jobs:
           name: changelog
           path: ./CHANGELOG.latest.md
 
-  publish-npm:
+  publish-npm-prerelease:
     environment:
       name: npm-prerelease
       url: https://npmjs.com/package/${{ steps.package-json.outputs.package-name }}/v/${{ steps.package-json.outputs.version }}
     if: needs.build.outputs.version-type != 'production'
-    name: Publish to NPM
+    name: Publish to NPM as prerelease
     needs: build
     runs-on: ubuntu-latest
     steps:
