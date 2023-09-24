@@ -21,9 +21,9 @@ jobs:
   create-pull-request:
     environment:
       name: admin
-      url: ${{ steps.summary.outputs.url }}
+      url: https://github.com/${{ github.repository }}/pull/${{ steps.pull-request.outputs.pull-request-number }}
     outputs:
-      url: ${{ steps.summary.outputs.url }}
+      url: https://github.com/${{ github.repository }}/pull/${{ steps.pull-request.outputs.pull-request-number }}
       version: ${{ steps.bump-version.outputs.version }}
     permissions:
       contents: write
@@ -44,23 +44,31 @@ jobs:
           npm version patch --no-git-tag-version
           echo version=$(cat package.json | jq -r .version) | tee --append $GITHUB_OUTPUT
       - name: Create branch
-        id: create-branch
+        id: branch
         run: |
           BRANCH_NAME=bot/prepare-release/${{ steps.bump-version.outputs.version }}
           echo branch-name=$BRANCH_NAME | tee --append $GITHUB_OUTPUT
 
           git checkout -b $BRANCH_NAME
       - name: Stage changes
-        run: git add --all
+        run: git add --all --verbose
       - name: Commit changes
         run: git commit --message "v${{ steps.bump-version.outputs.version }}"
       - name: Push to branch
-        run: git push --set-upstream origin ${{ steps.create-branch.outputs.branch-name }}
+        run: git push --set-upstream origin ${{ steps.branch.outputs.branch-name }}
       - env:
           GH_TOKEN: ${{ github.token }}
+        id: pull-request
         name: Create pull request
         run: |
-          PULL_REQUEST_NUMBER=$(gh api repos/${{ github.repository }}/pulls --field base=main --field head=${{ steps.create-branch.outputs.branch-name }} --field title="Release ${{ steps.bump-version.outputs.version }}" | jq -r '.number')
-          gh api repos/${{ github.repository }}/issues/$PULL_REQUEST_NUMBER/assignees --field assignees[]=${{ github.actor }}
-
-          echo url=https://github.com/${{ github.repository }}/pull/$PULL_REQUEST_NUMBER | tee --append $GITHUB_OUTPUT
+          gh api repos/${{ github.repository }}/pulls --field base=main --field head=${{ steps.branch.outputs.branch-name }} --field title="Release ${{ steps.bump-version.outputs.version }}" | tee /tmp/pull-request.json
+          echo pull-request-number=$(cat /tmp/pull-request.json | jq -r '.number') | tee --append $GITHUB_OUTPUT
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        name: Assign pull request ${{ steps.pull-request.outputs.pull-request-number }} to ${{ github.actor }}
+        run: gh api repos/${{ github.repository }}/issues/${{ steps.pull-request.outputs.pull-request-number }}/assignees --field assignees[]=${{ github.actor }}
+      - continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        name: Add label "release" to pull request ${{ steps.pull-request.outputs.pull-request-number }}
+        run: gh api repos/${{ github.repository }}/issues/${{ steps.pull-request.outputs.pull-request-number }}/labels --field labels[]=release
