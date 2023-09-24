@@ -46,7 +46,7 @@ jobs:
       - name: Create branch
         id: branch
         run: |
-          BRANCH_NAME=bot/prepare-release/${{ steps.bump-version.outputs.version }}
+          BRANCH_NAME=bot/prepare-release/${{ steps.bump-version.outputs.version }}/${{ github.run_number }}
           echo branch-name=$BRANCH_NAME | tee --append $GITHUB_OUTPUT
 
           git checkout -b $BRANCH_NAME
