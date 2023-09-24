@@ -78,6 +78,10 @@ This repository holds most reusable workflow for my own projects.
 - Use `$(< some-file.txt)` than `` `cat some-file.txt` ``
 - To use `bash` for-loop to loop through an array, `for i in $(cat file.json | jq -cr '.[]')`
 - Don't use `if: ${{ true }}`, it will be always true, use `if: true` instead
+- Triggering workflow
+   - `github.token` won't work, fine-grained per-repo PAT won't work
+   - GitHub App token work, use [this action](https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#authenticating-with-github-app-generated-tokens)
+   - More details at [this article](https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#triggering-further-workflow-runs)
 
 ## Snippets
 

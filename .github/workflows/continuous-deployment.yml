@@ -122,10 +122,11 @@ jobs:
       - upload-changelog
     runs-on: ubuntu-latest
     steps:
-      # - uses: actions/checkout@v3
-      #   with:
-      #     # Must use PAT to checkout, otherwise, it will not trigger "release created" event.
-      #     token: ${{ secrets.GH_TOKEN }}
+      - uses: tibdex/github-app-token@v1
+        id: generate-token
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
       - name: Download changelog artifact
         uses: actions/download-artifact@v3.0.1
         with:
@@ -135,7 +136,7 @@ jobs:
         with:
           name: tarball
       - env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         name: Create release
         run: gh release create v${{ needs.build.outputs.version }} *.tgz --notes-file ./CHANGELOG.latest.md --repo ${{ github.repository }} --target ${{ github.ref }}
 
