@@ -9,9 +9,6 @@ on:
       tag:
         required: true
         type: string
-    secrets:
-      GH_TOKEN: {}
-      NPM_TOKEN: {}
 
 defaults:
   run:
@@ -24,8 +21,6 @@ jobs:
   publish-package:
     environment:
       name: production
-      url: https://npmjs.com/package/${{ steps.package-json.outputs.package-name }}/v/${{ steps.package-json.outputs.version }}
-    outputs:
       url: https://npmjs.com/package/${{ steps.package-json.outputs.package-name }}/v/${{ steps.package-json.outputs.version }}
     runs-on: ubuntu-latest
     steps:
@@ -42,9 +37,8 @@ jobs:
         run: |
           echo package-name=`tar --extract --file=\`ls ./*.tgz\` --to-stdout package/package.json | jq -r .name` | tee --append $GITHUB_OUTPUT
           echo version=`tar --extract --file=\`ls ./*.tgz\` --to-stdout package/package.json | jq -r .version` | tee --append $GITHUB_OUTPUT
-      - if: ${{ contains(steps.package-json.outputs.version, '-') }}
-        name: 'Sanity check: Must not prerelease'
-        run: '[[ "${{ steps.package-json.outputs.version }}" != *-0 ]]'
+      - name: 'Sanity check: must not prerelease'
+        run: '[[ "${{ steps.package-json.outputs.version }}" != *-* ]]'
       # - env:
       #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       #   run: npm publish `ls ./*.tgz`
@@ -53,9 +47,7 @@ jobs:
     continue-on-error: true
     environment:
       name: admin
-      url: ${{ steps.summary.outputs.url }}
-    outputs:
-      url: ${{ steps.summary.outputs.url }}
+      url: ${{ github.server_url }}/${{ github.repository }}/pull/${{ steps.pull-request.outputs.pull-request-number }}
     permissions:
       contents: write
     runs-on: ubuntu-latest

@@ -86,7 +86,7 @@ jobs:
   publish-npm:
     environment:
       name: prerelease
-      url: ${{ steps.summary.outputs.url }}
+      url: https://npmjs.com/package/${{ steps.package-json.outputs.package-name }}/v/${{ steps.package-json.outputs.version }}
     if: needs.build.outputs.version-type != 'production'
     name: Publish to NPM
     needs: build
@@ -100,21 +100,16 @@ jobs:
         uses: actions/download-artifact@v3.0.1
         with:
           name: tarball
-      - id: read-package-json
+      - id: package-json
         name: Read package.json
         run: |
           echo package-name=`tar --extract --file=\`ls ./*.tgz\` --to-stdout package/package.json | jq -r .name` | tee --append $GITHUB_OUTPUT
           echo version=`tar --extract --file=\`ls ./*.tgz\` --to-stdout package/package.json | jq -r .version` | tee --append $GITHUB_OUTPUT
       - name: 'Sanity check: version must be prerelease'
-        run: '[[ "$(cat ./package.json | jq -r ''.version'')" == *-0 ]]'
+        run: '[[ "$(cat ./package.json | jq -r ''.version'')" == *-* ]]'
       - env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --tag ${{ github.ref_name }} `ls *.tgz`
-      - id: summary
-        name: Summary
-        run: |
-          echo url=https://npmjs.com/package/${{ steps.read-package-json.outputs.package-name }}/v/${{ steps.read-package-json.outputs.version }} | tee --append $GITHUB_OUTPUT
-          echo NPM package published to https://npmjs.com/package/${{ steps.read-package-json.outputs.package-name }}/v/${{ steps.read-package-json.outputs.version }}. | tee --append $GITHUB_STEP_SUMMARY
 
   publish-tag:
     if: needs.build.outputs.version-type == 'production'
