@@ -56,7 +56,9 @@ jobs:
         run: git commit --message "v${{ steps.bump-version.outputs.version }}"
       - name: Push to branch
         run: git push --set-upstream origin ${{ steps.create-branch.outputs.branch-name }}
-      - name: Create pull request
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        name: Create pull request
         run: |
           PULL_REQUEST_NUMBER=$(gh api repos/${{ github.repository }}/pulls --field base=main --field head=${{ steps.create-branch.outputs.branch-name }} --field title="Release ${{ steps.bump-version.outputs.version }}" | jq -r '.number')
           gh api repos/${{ github.repository }}/issues/$PULL_REQUEST_NUMBER/assignees --field assignees[]=${{ github.actor }}
