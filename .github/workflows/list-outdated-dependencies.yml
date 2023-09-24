@@ -2,7 +2,6 @@ name: List outdated dependencies
 
 on:
   workflow_call: {}
-  workflow_dispatch: {}
 
 defaults:
   run:
