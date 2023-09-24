@@ -142,6 +142,9 @@ jobs:
         run: git push --set-upstream origin ${{ steps.tag.outputs.tag }}
 
   publish-release:
+    environment:
+      name: admin
+      url: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ needs.publish-tag.outputs.tag }}
     if: needs.build.outputs.version-type == 'production'
     name: Publish release
     needs:
@@ -158,7 +161,7 @@ jobs:
         with:
           name: tarball
       - env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         name: Create release
         run: gh release create ${{ needs.publish-tag.outputs.tag }} *.tgz --notes-file ./CHANGELOG.latest.md --repo ${{ github.repository }}
 
