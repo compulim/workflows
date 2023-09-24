@@ -1,13 +1,5 @@
 name: Bump scaffold
 
-# To run this workflow:
-#
-# - Creates an environment named "admin"
-# - Adds a secret named GH_TOKEN with the following permissions to this repository:
-#   - contents: write
-#   - pull-requests: write
-#   - workflows: write
-
 on:
   workflow_call:
     inputs:

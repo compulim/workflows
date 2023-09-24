@@ -20,7 +20,7 @@ env:
 jobs:
   publish-package:
     environment:
-      name: production
+      name: npm-production
       url: https://npmjs.com/package/${{ steps.package-json.outputs.package-name }}/v/${{ steps.package-json.outputs.version }}
     runs-on: ubuntu-latest
     steps:
