@@ -91,7 +91,12 @@ jobs:
         id: pull-request
         name: Create pull request
         run: |
-          gh api repos/${{ github.repository }}/pulls --field base=main --field head=${{ steps.branch.outputs.branch-name }} --field title="Bump to ${{ steps.version.outputs.version }}" | tee /tmp/pull-request.json
+          gh api repos/${{ github.repository }}/pulls \
+            --field base=main \
+            --field body="> Created by workflow run ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            --field head=${{ steps.branch.outputs.branch-name }} \
+            --field title="Bump to ${{ steps.version.outputs.version }}" \
+            | tee /tmp/pull-request.json
           echo pull-request-number=$(cat /tmp/pull-request.json | jq -r '.number') | tee --append $GITHUB_OUTPUT
       - continue-on-error: true
         env:
