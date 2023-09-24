@@ -165,5 +165,5 @@ jobs:
         id: pull-request
         if: steps.get-changes.outputs.has-changes == 'true'
         name: Create pull request
-        run: echo url=$(gh pr create --fill --repo ${{ github.repository }}) | tee --append $GITHUB_OUTPUT
+        run: echo url=$(gh pr create --body "> Created in [workflow run ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})." --fill --repo ${{ github.repository }}) | tee --append $GITHUB_OUTPUT
         working-directory: ./current
