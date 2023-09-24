@@ -10,7 +10,9 @@ on:
       version:
         value: ${{ jobs.build.outputs.version }}
     secrets:
-      NPM_TOKEN: {}
+      NPM_TOKEN:
+        description: Token for NPM to publish prerelease version
+        required: true
 
 defaults:
   run:
@@ -21,6 +23,7 @@ env:
 
 jobs:
   build:
+    name: Build
     outputs:
       version: ${{ steps.version.outputs.version }}
       version-type: ${{ steps.version-type.outputs.version-type }}
@@ -72,6 +75,7 @@ jobs:
       name: prerelease
       url: ${{ steps.summary.outputs.url }}
     if: needs.build.outputs.version-type != 'production'
+    name: Publish to NPM
     needs: build
     runs-on: ubuntu-latest
     steps:
@@ -100,8 +104,9 @@ jobs:
           echo url=https://npmjs.com/package/${{ steps.read-package-json.outputs.package-name }}/v/${{ steps.read-package-json.outputs.version }} | tee --append $GITHUB_OUTPUT
           echo NPM package published to https://npmjs.com/package/${{ steps.read-package-json.outputs.package-name }}/v/${{ steps.read-package-json.outputs.version }}. | tee --append $GITHUB_STEP_SUMMARY
 
-  create-release:
+  publish-release:
     if: needs.build.outputs.version-type == 'production'
+    name: Publish to GitHub Release
     needs: build
     permissions:
       contents: write
@@ -120,7 +125,7 @@ jobs:
         name: Create tag
         run: |
           TAG_NAME=v${{ needs.build.outputs.version }}
-          git tag --annotate $TAG_NAME
+          git tag --annotate --message "${{ needs.build.outputs.version }} Release" $TAG_NAME
 
           echo tag=$TAG_NAME | tee --append $GITHUB_OUTPUT
       - name: Push tag
@@ -139,6 +144,7 @@ jobs:
   #   environment:
   #     name: github-pages
   #     url: ${{ steps.deployment.outputs.page_url }}
+  #   name: Publish to GitHub Pages
   #   needs: build
   #   permissions:
   #     pages: write
