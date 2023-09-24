@@ -8,7 +8,9 @@ on:
       version:
         value: ${{ jobs.create-pull-request.outputs.version }}
     secrets:
-      GH_TOKEN: {}
+      GH_TOKEN:
+        description: Token for GH CLI with Read and Write access to code, pull requests, and workflows
+        required: true
 
 defaults:
   run:
@@ -46,7 +48,7 @@ jobs:
       - name: Create branch
         id: branch
         run: |
-          BRANCH_NAME=bot/prepare-release/${{ steps.bump-version.outputs.version }}/${{ github.run_number }}
+          BRANCH_NAME=bot/prepare-release/${{ steps.bump-version.outputs.version }}
           echo branch-name=$BRANCH_NAME | tee --append $GITHUB_OUTPUT
 
           git checkout -b $BRANCH_NAME
@@ -57,18 +59,18 @@ jobs:
       - name: Push to branch
         run: git push --set-upstream origin ${{ steps.branch.outputs.branch-name }}
       - env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         id: pull-request
         name: Create pull request
         run: |
           gh api repos/${{ github.repository }}/pulls --field base=main --field head=${{ steps.branch.outputs.branch-name }} --field title="Release ${{ steps.bump-version.outputs.version }}" | tee /tmp/pull-request.json
           echo pull-request-number=$(cat /tmp/pull-request.json | jq -r '.number') | tee --append $GITHUB_OUTPUT
       - env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         name: Assign pull request ${{ steps.pull-request.outputs.pull-request-number }} to ${{ github.actor }}
         run: gh api repos/${{ github.repository }}/issues/${{ steps.pull-request.outputs.pull-request-number }}/assignees --field assignees[]=${{ github.actor }}
       - continue-on-error: true
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         name: Add label "release" to pull request ${{ steps.pull-request.outputs.pull-request-number }}
         run: gh api repos/${{ github.repository }}/issues/${{ steps.pull-request.outputs.pull-request-number }}/labels --field labels[]=release
