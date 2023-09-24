@@ -7,10 +7,6 @@ on:
         required: true
         type: string
     outputs:
-      npm-url:
-        value: ${{ jobs.publish-package.outputs.url }}
-      pages-url:
-        value: ${{ jobs.publish-pages.outputs.url }}
       version:
         value: ${{ jobs.build.outputs.version }}
     secrets:
@@ -26,26 +22,31 @@ env:
 jobs:
   build:
     outputs:
-      version: ${{ steps.set-version.outputs.version }}
+      version: ${{ steps.version.outputs.version }}
+      version-type: ${{ steps.version-type.outputs.version-type }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - id: version-type
+        name: Determine version type
+        run: 'if [[ "$(cat ./package.json | jq -r ''.version'')" == *-0 ]]; then echo version-type=prerelease | tee --append $GITHUB_OUTPUT; else echo version-type=production | tee --append $GITHUB_OUTPUT; fi'
       - name: Use Node.js ${{ env.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.node-version }}
           cache: 'npm'
-      - id: set-version
+      - if: steps.version-type.outputs.version-type != 'production'
         name: Run npx version-from-git --no-git-tag-version
-        run: |
-          npx version-from-git --no-git-tag-version
-          echo version=`cat package.json | jq -r '.version'` | tee --append $GITHUB_OUTPUT
+        run: npx version-from-git --no-git-tag-version
+      - id: version
+        name: Get version
+        run: echo version=`cat package.json | jq -r '.version'` | tee --append $GITHUB_OUTPUT
       - name: Uninstall current version
         run: npm uninstall --workspaces ${{ inputs.package-name }}
       - name: Update version
-        run: npm version --no-git-tag-version --no-workspaces-update --workspace=${{ inputs.package-name }} ${{ steps.set-version.outputs.version }}
+        run: npm version --no-git-tag-version --no-workspaces-update --workspace=${{ inputs.package-name }} ${{ steps.version.outputs.version }}
       - name: Propagate versions
-        run: npm install --workspaces ${{ inputs.package-name }}@${{ steps.set-version.outputs.version }}
+        run: npm install --workspaces ${{ inputs.package-name }}@${{ steps.version.outputs.version }}
       - run: npm clean-install
       - run: npm run build --if-present
       - name: Run npm pack
@@ -66,13 +67,12 @@ jobs:
         with:
           path: packages/pages/public
 
-  publish-package:
+  publish-prerelease-package:
     environment:
       name: prerelease
       url: ${{ steps.summary.outputs.url }}
+    if: needs.build.outputs.version-type != 'production'
     needs: build
-    outputs:
-      url: ${{ steps.summary.outputs.url }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-node@v3
@@ -88,11 +88,8 @@ jobs:
         run: |
           echo package-name=`tar --extract --file=\`ls ./*.tgz\` --to-stdout package/package.json | jq -r .name` | tee --append $GITHUB_OUTPUT
           echo version=`tar --extract --file=\`ls ./*.tgz\` --to-stdout package/package.json | jq -r .version` | tee --append $GITHUB_OUTPUT
-      - if: ${{ !contains(steps.read-package-json.outputs.version, '-') }}
-        name: Check version number
-        run: |
-          echo ::error::Cannot publish production version ${{ steps.read-package-json.outputs.version }}
-          exit 1
+      - name: 'Sanity check: version must be prerelease'
+        run: [[ "$(cat ./package.json | jq -r ''.version'')" == *-0 ]]
       # Temporarily disable publish
       # - env:
       #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -103,14 +100,46 @@ jobs:
           echo url=https://npmjs.com/package/${{ steps.read-package-json.outputs.package-name }}/v/${{ steps.read-package-json.outputs.version }} | tee --append $GITHUB_OUTPUT
           echo NPM package published to https://npmjs.com/package/${{ steps.read-package-json.outputs.package-name }}/v/${{ steps.read-package-json.outputs.version }}. | tee --append $GITHUB_STEP_SUMMARY
 
+  create-release:
+    if: needs.build.outputs.version-type == 'production'
+    needs: build
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download tarball artifact
+        uses: actions/download-artifact@v3.0.1
+        with:
+          name: tarball
+      - name: Configure user profile
+        run: |
+          git config user.email "${{ format('@{0}', github.actor) }}"
+          git config user.name "${{ format('@{0}', github.actor) }}"
+      - id: tag
+        name: Create tag
+        run: |
+          TAG_NAME=v${{ needs.build.outputs.version }}
+          git tag --annotate $TAG_NAME
+
+          echo tag=$TAG_NAME | tee --append $GITHUB_OUTPUT
+      - name: Push tag
+        run: git push --set-upstream origin ${{ steps.tag.outputs.tag }}
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        name: Create release
+        run: gh release create ${{ steps.tag.outputs.tag }}
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        name: Upload asset
+        run: gh release upload ${{ steps.tag.outputs.tag }} *.tgz
+
   # Temporarily disable publish
   # publish-pages:
   #   environment:
   #     name: github-pages
   #     url: ${{ steps.deployment.outputs.page_url }}
   #   needs: build
-  #   outputs:
-  #     url: ${{ steps.deployment.outputs.page_url }}
   #   permissions:
   #     pages: write
   #     id-token: write
