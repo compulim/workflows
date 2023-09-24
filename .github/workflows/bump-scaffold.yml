@@ -142,10 +142,6 @@ jobs:
           done
         working-directory: ./template/scaffold/merge/
 
-      - name: Remove ${{ inputs.package-name }}/babel.jest.config.json
-        run: rm babel.jest.config.json
-        working-directory: ./current/packages/${{ inputs.package-name }}/
-
       - continue-on-error: true
         name: Update configuration files
         run: |
