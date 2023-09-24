@@ -129,10 +129,10 @@ jobs:
       - id: tag
         name: Create tag
         run: |
-          TAG_NAME=v${{ needs.build.outputs.version }}
-          git tag --annotate --message "${{ needs.build.outputs.version }} Release" $TAG_NAME
+          TAG=v${{ needs.build.outputs.version }}
+          git tag --annotate --message "${{ needs.build.outputs.version }} Release" $TAG
 
-          echo tag=$TAG_NAME | tee --append $GITHUB_OUTPUT
+          echo tag=$TAG | tee --append $GITHUB_OUTPUT
       - name: Push tag
         run: git push --set-upstream origin ${{ steps.tag.outputs.tag }}
 
