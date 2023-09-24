@@ -2,10 +2,6 @@ name: Prepare release
 
 on:
   workflow_call:
-    inputs:
-      package-name:
-        required: true
-        type: string
     outputs:
       pull-request-url:
         value: ${{ jobs.create-pull-request.outputs.url }}
