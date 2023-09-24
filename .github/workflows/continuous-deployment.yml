@@ -106,7 +106,7 @@ jobs:
         run: '[[ "$(cat ./package.json | jq -r ''.version'')" == *-* ]]'
       - env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish --tag ${{ github.ref_name }} `ls *.tgz`
+        run: npm publish --access public --provenance --tag ${{ github.ref_name }} `ls *.tgz`
 
   publish-release:
     environment:
