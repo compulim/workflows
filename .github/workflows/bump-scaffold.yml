@@ -105,6 +105,22 @@ jobs:
           done
         working-directory: ./template/scaffold/copy/packages/${{ inputs.package-name }}/
 
+      - name: Remove React in Jest config
+        if: '!inputs.use-react'
+        run: |
+          # Remove @babel/preset-react from jest.config.json/transform
+
+          for i in $(ls -1 jest.*.json)
+          do
+            echo --- $i
+
+            cat $i | jq -r '. | .transform |= with_entries(if ((.value | type == "array") and .value[0] == "babel-jest") then . | (.value[1].presets |= map(select((. == "@babel/preset-react" or (. | type == "array" and .[0] == "@babel/preset-react") | not)))) else . end)' | tee /tmp/output.tmp
+            mv /tmp/output.tmp $i
+
+            echo
+          done
+        working-directory: ./template/scaffold/copy/packages/${{ inputs.package-name }}/
+
       - name: Copy scaffold
         run: rsync --recursive --verbose ./template/scaffold/copy/ ./current/
 
