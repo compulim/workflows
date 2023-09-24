@@ -2,6 +2,18 @@
 
 This repository holds most reusable workflow for my own projects.
 
+## How it works
+
+- Primary workflows
+   - Pull request validation: run on pull request
+   - Continuous deployment: after merging into `main` branch
+      - Deploy to GitHub Pages
+      - If merge is on prerelease, deploy prerelease to NPM
+      - If merge in on production, deploy to GitHub Release
+   - Production deployment: after release is created
+      - Download and deploy to NPM
+      - Pull request to bump to next prepatch
+
 ## Things I learnt while writing good GitHub workflow
 
 - One step, one command
