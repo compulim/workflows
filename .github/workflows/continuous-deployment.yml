@@ -139,7 +139,7 @@ jobs:
         name: Create release
         run: |
           TAG=v${{ needs.build.outputs.version }}
-          gh release create $TAG --notes-file ./CHANGELOG.latest.md --repo ${{ github.repository }} --target ${{ github.ref }}
+          gh release create $TAG ./*.tgz --notes-file ./CHANGELOG.latest.md --repo ${{ github.repository }} --target ${{ github.ref }}
 
           echo tag=$TAG | tee --append $GITHUB_OUTPUT
       # - env:
@@ -155,14 +155,14 @@ jobs:
       #       --field target_commitish='${{ github.ref }}' \
       #       --field name='v${{ needs.build.outputs.version }}' | tee /tmp/output.json
       #     echo tag=$(cat /tmp/output.json | jq -r .tag_name) | tee --append $GITHUB_OUTPUT
-      - env:
-          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
-        name: Add release notes
-        run: gh release edit ${{ steps.release.outputs.tag }} --notes-file ./CHANGELOG.latest.md --repo ${{ github.repository }}
-      - env:
-          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
-        name: Upload assets
-        run: gh release upload ${{ steps.release.outputs.tag }} *.tgz --repo ${{ github.repository }}
+      # - env:
+      #     GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+      #   name: Add release notes
+      #   run: gh release edit ${{ steps.release.outputs.tag }} --notes-file ./CHANGELOG.latest.md --repo ${{ github.repository }}
+      # - env:
+      #     GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+      #   name: Upload assets
+      #   run: gh release upload ${{ steps.release.outputs.tag }} *.tgz --repo ${{ github.repository }}
 
   publish-pages:
     environment:
