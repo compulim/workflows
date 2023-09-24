@@ -26,7 +26,7 @@ jobs:
       url: https://github.com/${{ github.repository }}/pull/${{ steps.pull-request.outputs.pull-request-number }}
     outputs:
       url: https://github.com/${{ github.repository }}/pull/${{ steps.pull-request.outputs.pull-request-number }}
-      version: ${{ steps.bump-version.outputs.version }}
+      version: ${{ steps.version.outputs.version }}
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -41,21 +41,23 @@ jobs:
         with:
           node-version: ${{ env.node-version }}
           cache: 'npm'
-      - id: bump-version
+      - id: version
         run: |
           npm version patch --no-git-tag-version
           echo version=$(cat package.json | jq -r .version) | tee --append $GITHUB_OUTPUT
       - name: Create branch
         id: branch
         run: |
-          BRANCH_NAME=bot/prepare-release/${{ steps.bump-version.outputs.version }}
+          BRANCH_NAME=bot/prepare-release/${{ steps.version.outputs.version }}
           echo branch-name=$BRANCH_NAME | tee --append $GITHUB_OUTPUT
 
           git checkout -b $BRANCH_NAME
+      - name: Update CHANGELOG.md
+        run: npx keep-a-changelog --release ${{ steps.version.outputs.version }}
       - name: Stage changes
         run: git add --all --verbose
       - name: Commit changes
-        run: git commit --message "v${{ steps.bump-version.outputs.version }}"
+        run: git commit --message "v${{ steps.version.outputs.version }}"
       - name: Push to branch
         run: git push --set-upstream origin ${{ steps.branch.outputs.branch-name }}
       - env:
@@ -63,7 +65,7 @@ jobs:
         id: pull-request
         name: Create pull request
         run: |
-          gh api repos/${{ github.repository }}/pulls --field base=main --field head=${{ steps.branch.outputs.branch-name }} --field title="Release ${{ steps.bump-version.outputs.version }}" | tee /tmp/pull-request.json
+          gh api repos/${{ github.repository }}/pulls --field base=main --field head=${{ steps.branch.outputs.branch-name }} --field title="${{ steps.version.outputs.version }} Release" | tee /tmp/pull-request.json
           echo pull-request-number=$(cat /tmp/pull-request.json | jq -r '.number') | tee --append $GITHUB_OUTPUT
       - env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
