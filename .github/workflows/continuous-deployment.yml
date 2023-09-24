@@ -9,10 +9,6 @@ on:
     outputs:
       version:
         value: ${{ jobs.build.outputs.version }}
-    secrets:
-      NPM_TOKEN:
-        description: Token for NPM to publish prerelease version
-        required: true
 
 defaults:
   run:
