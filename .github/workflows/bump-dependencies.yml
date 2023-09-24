@@ -62,10 +62,16 @@ jobs:
         id: pull-request
         name: Create pull request
         run: |
-          gh api repos/${{ github.repository }}/pulls --field base=main --field head=${{ steps.create-branch.outputs.branch-name }} --field title="Bump dependencies" | tee /tmp/output.json
+          gh api repos/${{ github.repository }}/pulls \
+            --field base=main \
+            --field head=${{ steps.create-branch.outputs.branch-name }} \
+            --field title="Bump dependencies" \
+            | tee /tmp/output.json
           echo pull-request-number=$(cat /tmp/output.json | jq -r .number) | tee --append $GITHUB_OUTPUT
       - continue-on-error: true
         env:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         name: Assign pull request ${{ steps.pull-request.outputs.pull-request-number }} to ${{ github.actor }}
-        run: gh api repos/${{ github.repository }}/issues/${{ steps.pull-request.outputs.pull-request-number }}/assignees --field assignees[]=${{ github.actor }}
+        run: |
+          gh api repos/${{ github.repository }}/issues/${{ steps.pull-request.outputs.pull-request-number }}/assignees \
+            --field assignees[]=${{ github.actor }}
