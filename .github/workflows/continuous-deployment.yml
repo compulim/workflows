@@ -139,7 +139,7 @@ jobs:
         name: Create release
         run: |
           TAG=v${{ needs.build.outputs.version }}
-          gh release create $TAG --repo ${{ github.repository }} --target ${{ github.ref }}
+          gh release create $TAG --notes-file ./CHANGELOG.latest.md --repo ${{ github.repository }} --target ${{ github.ref }}
 
           echo tag=$TAG | tee --append $GITHUB_OUTPUT
       # - env:
