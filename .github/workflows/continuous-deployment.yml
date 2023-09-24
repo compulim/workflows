@@ -93,27 +93,29 @@ jobs:
         run: |
           echo ::error::Cannot publish production version ${{ steps.read-package-json.outputs.version }}
           exit 1
-      - env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish --tag ${{ github.ref_name }} `ls *.tgz`
+      # Temporarily disable publish
+      # - env:
+      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      #   run: npm publish --tag ${{ github.ref_name }} `ls *.tgz`
       - id: summary
         name: Summary
         run: |
           echo url=https://npmjs.com/package/${{ steps.read-package-json.outputs.package-name }}/v/${{ steps.read-package-json.outputs.version }} | tee --append $GITHUB_OUTPUT
           echo NPM package published to https://npmjs.com/package/${{ steps.read-package-json.outputs.package-name }}/v/${{ steps.read-package-json.outputs.version }}. | tee --append $GITHUB_STEP_SUMMARY
 
-  publish-pages:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    needs: build
-    outputs:
-      url: ${{ steps.deployment.outputs.page_url }}
-    permissions:
-      pages: write
-      id-token: write
-    runs-on: ubuntu-latest
-    steps:
-      - id: deployment
-        name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v2
+  # Temporarily disable publish
+  # publish-pages:
+  #   environment:
+  #     name: github-pages
+  #     url: ${{ steps.deployment.outputs.page_url }}
+  #   needs: build
+  #   outputs:
+  #     url: ${{ steps.deployment.outputs.page_url }}
+  #   permissions:
+  #     pages: write
+  #     id-token: write
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - id: deployment
+  #       name: Deploy to GitHub Pages
+  #       uses: actions/deploy-pages@v2
