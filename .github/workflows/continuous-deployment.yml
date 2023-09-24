@@ -30,7 +30,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.node-version }}
-          cache: 'npm'
+          cache: npm
       - if: steps.version-type.outputs.version-type != 'production'
         name: Run npx version-from-git --no-git-tag-version
         run: npx version-from-git --no-git-tag-version

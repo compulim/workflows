@@ -72,7 +72,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.node-version }}
-          cache: 'npm'
+          cache: npm
       - id: version
         run: |
           npm version prepatch --no-git-tag-version

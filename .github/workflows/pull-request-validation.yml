@@ -27,7 +27,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.node-version }}
-          cache: 'npm'
+          cache: npm
       - name: 'Sanity check: must from https://registry.npmjs.org/'
         run: cat ./package-lock.json | jq '.packages | with_entries(select(.value.link | not)) | with_entries(select(.value.resolved != null)) | with_entries(select(.value.resolved | startswith("https://registry.npmjs.org/") | not)) | if length > 0 then halt_error(1) else empty end'
       - run: npm clean-install
