@@ -53,6 +53,8 @@ jobs:
     environment:
       name: workflow-bot
       url: ${{ github.server_url }}/${{ github.repository }}/pull/${{ steps.pull-request.outputs.pull-request-number }}
+    # Only create pull request after publish to NPM succeed.
+    needs: publish-package
     permissions:
       contents: write
     runs-on: ubuntu-latest
