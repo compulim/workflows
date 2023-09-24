@@ -36,7 +36,7 @@ jobs:
         run: npx version-from-git --no-git-tag-version
       - id: version
         name: Get version
-        run: echo version=`cat package.json | jq -r '.version'` | tee --append $GITHUB_OUTPUT
+        run: echo version=$(cat package.json | jq -r '.version') | tee --append $GITHUB_OUTPUT
       - name: Uninstall current version
         run: npm uninstall --workspaces ${{ inputs.package-name }}
       - name: Update version
@@ -100,13 +100,17 @@ jobs:
       - id: package-json
         name: Read package.json
         run: |
-          echo package-name=`tar --extract --file=\`ls ./*.tgz\` --to-stdout package/package.json | jq -r .name` | tee --append $GITHUB_OUTPUT
-          echo version=`tar --extract --file=\`ls ./*.tgz\` --to-stdout package/package.json | jq -r .version` | tee --append $GITHUB_OUTPUT
-      - name: 'Sanity check: version must be prerelease'
-        run: '[[ "$(cat ./package.json | jq -r ''.version'')" == *-* ]]'
+          tar --extract --file=$(ls ./*.tgz) --to-stdout package/package.json | tee /tmp/package.json
+
+          echo package-name=$(cat /tmp/package.json | jq -r .name) | tee --append $GITHUB_OUTPUT
+          echo version=$(cat /tmp/package.json | jq -r .version) | tee --append $GITHUB_OUTPUT
+      - name: 'Sanity check: must package name of "${{ inputs.package-name }}"'
+        run: '[[ "${{ steps.package-json.outputs.package-name }}" == "${{ inputs.package-name }}" ]]'
+      - name: 'Sanity check: must not be prerelease'
+        run: '[[ "${{ steps.package-json.outputs.version }}" != *-* ]]'
       - env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish --access public --provenance --tag ${{ github.ref_name }} `ls *.tgz`
+        run: npm publish --access public --provenance --tag ${{ github.ref_name }} $(ls *.tgz)
 
   publish-release:
     environment:
