@@ -1,9 +1,12 @@
-name: Publish release on push tag
+name: Publish release
 
 on:
   workflow_call:
     inputs:
       package-name:
+        required: true
+        type: string
+      tag:
         required: true
         type: string
     secrets:
@@ -18,24 +21,10 @@ env:
   node-version: 18.x
 
 jobs:
-  download-release:
-    runs-on: ubuntu-latest
-    steps:
-      - env:
-          GH_TOKEN: ${{ github.token }}
-        name: Download assets
-        run: gh release download ${{ github.ref }} --repo ${{ github.repository }}
-      - name: Upload tarball artifact
-        uses: actions/upload-artifact@v3.1.1
-        with:
-          name: tarball
-          path: ./*.tgz
-
   publish-package:
     environment:
       name: production
       url: https://npmjs.com/package/${{ steps.package-json.outputs.package-name }}/v/${{ steps.package-json.outputs.version }}
-    needs: download-release
     outputs:
       url: https://npmjs.com/package/${{ steps.package-json.outputs.package-name }}/v/${{ steps.package-json.outputs.version }}
     runs-on: ubuntu-latest
@@ -44,10 +33,10 @@ jobs:
         with:
           node-version: ${{ env.node-version }}
           registry-url: https://registry.npmjs.org/
-      - name: Download tarball artifact
-        uses: actions/download-artifact@v3.0.1
-        with:
-          name: tarball
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        name: Download assets
+        run: gh release download ${{ inputs.tag }} --repo ${{ github.repository }}
       - id: package-json
         name: Read package.json
         run: |
