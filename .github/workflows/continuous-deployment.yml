@@ -111,31 +111,6 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --tag ${{ github.ref_name }} `ls *.tgz`
 
-  # publish-tag:
-  #   if: needs.build.outputs.version-type == 'production'
-  #   name: Publish tag
-  #   needs: build
-  #   outputs:
-  #     tag: ${{ steps.tag.outputs.tag }}
-  #   permissions:
-  #     contents: write
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - name: Configure user profile
-  #       run: |
-  #         git config user.email "${{ format('@{0}', github.actor) }}"
-  #         git config user.name "${{ format('@{0}', github.actor) }}"
-  #     - id: tag
-  #       name: Create tag
-  #       run: |
-  #         TAG=v${{ needs.build.outputs.version }}
-  #         git tag --annotate --message "${{ needs.build.outputs.version }} Release" $TAG
-
-  #         echo tag=$TAG | tee --append $GITHUB_OUTPUT
-  #     - name: Push tag
-  #       run: git push --set-upstream origin ${{ steps.tag.outputs.tag }}
-
   publish-release:
     environment:
       name: admin
@@ -148,6 +123,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          # Must use PAT to checkout, otherwise, it will not trigger "release created" event.
+          token: ${{ secrets.GH_TOKEN }}
       - name: Download changelog artifact
         uses: actions/download-artifact@v3.0.1
         with:
