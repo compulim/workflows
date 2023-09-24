@@ -45,9 +45,9 @@ jobs:
         run: '[[ "${{ steps.package-json.outputs.package-name }}" == "${{ inputs.package-name }}" ]]'
       - name: 'Sanity check: must not be prerelease'
         run: '[[ "${{ steps.package-json.outputs.version }}" != *-* ]]'
-      # - env:
-      #     NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      #   run: npm publish $(ls ./*.tgz)
+      - env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish $(ls ./*.tgz)
 
   create-pull-request:
     environment:
