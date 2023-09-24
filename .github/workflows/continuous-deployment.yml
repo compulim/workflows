@@ -143,6 +143,7 @@ jobs:
     if: needs.build.outputs.version-type == 'production'
     name: Publish release
     needs:
+      - build
       - upload-changelog
     runs-on: ubuntu-latest
     steps:
