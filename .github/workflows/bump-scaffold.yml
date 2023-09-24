@@ -34,7 +34,7 @@ jobs:
         uses: compulim/tibdex-github-app-token@v2.1.0
         with:
           app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+          private_key: ${{ secrets.PRIVATE_KEY }}
 
       - name: Check out current
         uses: actions/checkout@v3
