@@ -1,0 +1,68 @@
+name: Prepare release
+
+on:
+  workflow_call:
+    inputs:
+      package-name:
+        required: true
+        type: string
+    outputs:
+      pull-request-url:
+        value: ${{ jobs.create-pull-request.outputs.url }}
+      version:
+        value: ${{ jobs.create-pull-request.outputs.version }}
+    secrets:
+      GH_TOKEN: {}
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  node-version: 18.x
+
+jobs:
+  create-pull-request:
+    environment:
+      name: admin
+      url: ${{ steps.summary.outputs.url }}
+    outputs:
+      url: ${{ steps.summary.outputs.url }}
+      version: ${{ steps.bump-version.outputs.version }}
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure user profile
+        run: |
+          git config user.email "${{ format('@{0}', github.actor) }}"
+          git config user.name "${{ format('@{0}', github.actor) }}"
+      - name: Use Node.js ${{ env.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.node-version }}
+          cache: 'npm'
+      - id: bump-version
+        run: |
+          npm version patch --no-git-tag-version
+          echo version=$(cat package.json | jq -r .version) | tee --append $GITHUB_OUTPUT
+      - name: Create branch
+        id: create-branch
+        run: |
+          BRANCH_NAME=bot/prepare-release/${{ steps.bump-version.outputs.version }}
+          echo branch-name=$BRANCH_NAME | tee --append $GITHUB_OUTPUT
+
+          git checkout -b $BRANCH_NAME
+      - name: Stage changes
+        run: git add --all
+      - name: Commit changes
+        run: git commit --message "v${{ steps.bump-version.outputs.version }}"
+      - name: Push to branch
+        run: git push --set-upstream origin ${{ steps.create-branch.outputs.branch-name }}
+      - name: Create pull request
+        run: |
+          PULL_REQUEST_NUMBER=$(gh api repos/${{ github.repository }}/pulls --field base=main --field head=${{ steps.create-branch.outputs.branch-name }} --field title="Release ${{ steps.bump-version.outputs.version }}" | jq -r '.number')
+          gh api repos/${{ github.repository }}/issues/$PULL_REQUEST_NUMBER/assignees --field assignees[]=${{ github.actor }}
+
+          echo url=https://github.com/${{ github.repository }}/pull/$PULL_REQUEST_NUMBER | tee --append $GITHUB_OUTPUT
