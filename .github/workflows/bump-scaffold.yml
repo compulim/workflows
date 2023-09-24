@@ -31,24 +31,23 @@ defaults:
 jobs:
   bump-scaffold:
     environment:
-      name: admin
-      url: ${{ steps.summary.outputs.url }}
+      name: workflow-bot
+      url: ${{ steps.pull-request.outputs.url }}
     name: Bump scaffold
     runs-on: ubuntu-latest
 
     steps:
-      - name: Validate environment
-        run: |
-          if [ -z "${{ secrets.GH_TOKEN }}" ]
-          then
-            exit 1
-          fi
+      - id: generate-token
+        name: Generate token for workflow-bot
+        uses: compulim/tibdex-github-app-token@v2.1.0
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
 
       - name: Check out current
         uses: actions/checkout@v3
         with:
           path: ./current
-          token: ${{ secrets.GH_TOKEN }}
 
       - name: Check out template
         uses: actions/checkout@v3
@@ -165,7 +164,7 @@ jobs:
         working-directory: ./current
 
       - env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         id: create-pull-request
         if: steps.get-changes.outputs.has-changes == 'true'
         name: Create pull request

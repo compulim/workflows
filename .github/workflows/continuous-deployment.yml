@@ -85,7 +85,7 @@ jobs:
 
   publish-npm:
     environment:
-      name: prerelease
+      name: npm-prerelease
       url: https://npmjs.com/package/${{ steps.package-json.outputs.package-name }}/v/${{ steps.package-json.outputs.version }}
     if: needs.build.outputs.version-type != 'production'
     name: Publish to NPM
@@ -136,6 +136,7 @@ jobs:
         uses: actions/download-artifact@v3.0.1
         with:
           name: tarball
+      # Creating release using `gh release create` don't trigger workflow.
       # - env:
       #     GH_TOKEN: ${{ steps.generate-token.outputs.token }}
       #   name: Create release
@@ -145,14 +146,14 @@ jobs:
         id: release
         name: Create release
         run: |
-          gh api /repos/${{ github.repository }}/releases \
+          gh api repos/${{ github.repository }}/releases \
             --method POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            -f tag_name='v${{ needs.build.outputs.version }}' \
-            -f target_commitish='${{ github.ref }}' \
-            -f name='v${{ needs.build.outputs.version }}' | tee /tmp/output.json
-          echo tag=$(jq -r .tag_name) | tee --append $GITHUB_OUTPUT
+            --header "Accept: application/vnd.github+json" \
+            --header "X-GitHub-Api-Version: 2022-11-28" \
+            --field tag_name='v${{ needs.build.outputs.version }}' \
+            --field target_commitish='${{ github.ref }}' \
+            --field name='v${{ needs.build.outputs.version }}' | tee /tmp/output.json
+          echo tag=$(cat /tmp/output.json | jq -r .tag_name) | tee --append $GITHUB_OUTPUT
       - env:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         name: Add release notes

@@ -1,16 +1,7 @@
 name: Prepare release
 
 on:
-  workflow_call:
-    outputs:
-      pull-request-url:
-        value: ${{ jobs.create-pull-request.outputs.url }}
-      version:
-        value: ${{ jobs.create-pull-request.outputs.version }}
-    secrets:
-      GH_TOKEN:
-        description: Token for GH CLI with Read and Write access to code, pull requests, and workflows
-        required: true
+  workflow_call: {}
 
 defaults:
   run:
@@ -22,15 +13,18 @@ env:
 jobs:
   create-pull-request:
     environment:
-      name: admin
+      name: workflow-bot
       url: https://github.com/${{ github.repository }}/pull/${{ steps.pull-request.outputs.pull-request-number }}
-    outputs:
-      url: https://github.com/${{ github.repository }}/pull/${{ steps.pull-request.outputs.pull-request-number }}
-      version: ${{ steps.version.outputs.version }}
     permissions:
       contents: write
     runs-on: ubuntu-latest
     steps:
+      - id: generate-token
+        name: Generate token for workflow-bot
+        uses: compulim/tibdex-github-app-token@v2.1.0
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
       - uses: actions/checkout@v3
       - name: Configure user profile
         run: |
@@ -61,7 +55,7 @@ jobs:
       - name: Push to branch
         run: git push --set-upstream origin ${{ steps.branch.outputs.branch-name }}
       - env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         id: pull-request
         name: Create pull request
         run: |
@@ -69,11 +63,11 @@ jobs:
           echo pull-request-number=$(cat /tmp/pull-request.json | jq -r '.number') | tee --append $GITHUB_OUTPUT
       - continue-on-error: true
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         name: Assign pull request ${{ steps.pull-request.outputs.pull-request-number }} to ${{ github.actor }}
         run: gh api repos/${{ github.repository }}/issues/${{ steps.pull-request.outputs.pull-request-number }}/assignees --field assignees[]=${{ github.actor }}
       - continue-on-error: true
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         name: Add label "release" to pull request ${{ steps.pull-request.outputs.pull-request-number }}
         run: gh api repos/${{ github.repository }}/issues/${{ steps.pull-request.outputs.pull-request-number }}/labels --field labels[]=release

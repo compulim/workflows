@@ -6,12 +6,6 @@ on:
       package-name:
         required: true
         type: string
-    outputs:
-      pull-request-url:
-        value: ${{ jobs.create-bump-pull-request.outputs.url }}
-    secrets:
-      GH_TOKEN: {}
-      NPM_TOKEN: {}
 
 defaults:
   run:
@@ -21,17 +15,22 @@ env:
   node-version: 18.x
 
 jobs:
-  create-bump-pull-request:
+  create-pull-request:
     continue-on-error: true
     environment:
-      name: pull-request
-      url: ${{ steps.summary.outputs.url }}
-    outputs:
-      url: ${{ steps.summary.outputs.url }}
+      name: workflow-bot
+      url: ${{ steps.pull-request.outputs.url }}
+    name: Create pull request
     permissions:
       contents: write
     runs-on: ubuntu-latest
     steps:
+      - id: generate-token
+        name: Generate token for workflow-bot
+        uses: compulim/tibdex-github-app-token@v2.1.0
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
       - uses: actions/checkout@v3
       - name: Configure user profile
         run: |
@@ -41,35 +40,37 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.node-version }}
-          cache: 'npm'
+          cache: npm
       - run: npm clean-install
       - run: npm run bump
       - name: Create branch
-        id: create-branch
+        id: branch
         run: |
           BRANCH_NAME=bot/bump-deps/${{ github.run_number }}
-          echo branch-name=$BRANCH_NAME | tee --append $GITHUB_OUTPUT
-
           git checkout -b $BRANCH_NAME
-          git add --all
-          git commit --message "Bump dependencies"
-          git push --set-upstream origin $BRANCH_NAME
+
+          echo branch-name=$BRANCH_NAME | tee --append $GITHUB_OUTPUT
+      - name: Stage changes
+        run: git add --all
+      - name: Commit changes
+        run: git commit --message "Bump dependencies"
+      - name: Push changes
+        run: git push --set-upstream origin ${{ steps.branch.outputs.branch-name }}
       - continue-on-error: true
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
-        id: create-pull-request
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+        id: pull-request
         name: Create pull request
         run: |
-          PULL_REQUEST_NUMBER=`gh api repos/${{ github.repository }}/pulls --field base=main --field head=${{ steps.create-branch.outputs.branch-name }} --field title="Bump dependencies" | jq -r '.number'`
-          gh api repos/${{ github.repository }}/issues/$PULL_REQUEST_NUMBER/assignees --field assignees[]=${{ github.actor }}
-          echo url=https://github.com/${{ github.repository }}/pull/$PULL_REQUEST_NUMBER | tee --append $GITHUB_OUTPUT
-      - id: summary
-        name: Summary
-        run: |
-          if [ "${{ steps.create-pull-request.outputs.url }}" = "" ]; then
-            echo url=https://github.com/${{ github.repository }}/compare/main...${{ steps.create-branch.outputs.branch-name }} | tee --append $GITHUB_OUTPUT
-            echo "Branch created at [${{ steps.create-branch.outputs.branch-name }}](https://github.com/${{ github.repository }}/compare/main...${{ steps.create-branch.outputs.branch-name }})" | tee --append $GITHUB_STEP_SUMMARY
-          else
-            echo url=${{ steps.create-pull-request.outputs.url }} | tee --append $GITHUB_OUTPUT
-            echo Pull request created at ${{ steps.create-pull-request.outputs.url }}. | tee --append $GITHUB_STEP_SUMMARY
-          fi
+          gh api repos/${{ github.repository }}/pulls --field base=main --field head=${{ steps.create-branch.outputs.branch-name }} --field title="Bump dependencies" | tee /tmp/output.json
+          echo pull-request-number=$(cat /tmp/output.json | jq -r .number) | tee --append $GITHUB_OUTPUT
+      - continue-on-error: true
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+        name: Assign pull request ${{ steps.pull-request.outputs.pull-request-number }} to ${{ github.actor }}
+        run: gh api repos/${{ github.repository }}/issues/${{ steps.pull-request.outputs.pull-request-number }}/assignees --field assignees[]=${{ github.actor }}
+      - continue-on-error: true
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+        name: Add label "bot" to pull request ${{ steps.pull-request.outputs.pull-request-number }}
+        run: gh api repos/${{ github.repository }}/issues/${{ steps.pull-request.outputs.pull-request-number }}/labels --field labels[]=bot
