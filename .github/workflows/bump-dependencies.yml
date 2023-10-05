@@ -65,7 +65,7 @@ jobs:
           gh api repos/${{ github.repository }}/pulls \
             --field base=main \
             --field body="> Created in [workflow run ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})." \
-            --field head=${{ steps.create-branch.outputs.branch-name }} \
+            --field head=${{ steps.branch.outputs.branch-name }} \
             --field title="Bump dependencies" \
             | tee /tmp/output.json
           echo pull-request-number=$(cat /tmp/output.json | jq -r .number) | tee --append $GITHUB_OUTPUT
