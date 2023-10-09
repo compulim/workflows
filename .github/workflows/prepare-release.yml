@@ -48,7 +48,7 @@ jobs:
 
           git checkout -b $BRANCH_NAME
       - name: Update CHANGELOG.md
-        run: npx keep-a-changelog --release ${{ steps.version.outputs.version }}
+        run: npx keep-a-changelog --format markdownlint --release ${{ steps.version.outputs.version }}
       - name: Stage changes
         run: git add --all --verbose
       - name: Commit changes
