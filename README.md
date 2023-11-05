@@ -91,7 +91,8 @@ This repository holds most reusable workflow for my own projects.
 - To use `bash` for-loop to loop through an array, `for i in $(cat file.json | jq -cr '.[]')`
 - Don't use `if: ${{ true }}`, it will be always true, use `if: true` instead
 - Triggering workflow
-   - `github.token` won't work, fine-grained per-repo PAT won't work
+   - `github.token` won't work
+   - Fine-grained PAT only work with "push" event, but won't work with "create release" event
    - GitHub App token work, use [this action](https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#authenticating-with-github-app-generated-tokens)
    - More details at [this article](https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#triggering-further-workflow-runs)
 
