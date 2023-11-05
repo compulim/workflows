@@ -90,6 +90,7 @@ This repository holds most reusable workflow for my own projects.
 - Use `$(< some-file.txt)` than `` `cat some-file.txt` ``
 - To use `bash` for-loop to loop through an array, `for i in $(cat file.json | jq -cr '.[]')`
 - Don't use `if: ${{ true }}`, it will be always true, use `if: true` instead
+- Use `{ echo abc=123; echo xyz=789; } | tee --append $GITHUB_OUTPUT` for simplicity
 - Triggering workflow
    - `github.token` won't work
    - Fine-grained PAT only work with "push" event, but won't work with "create release" event
