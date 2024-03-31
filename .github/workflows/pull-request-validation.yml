@@ -7,6 +7,7 @@ on:
         required: true
         type: string
       react-version:
+        default: current
         required: false
         type: string
       skip-integration-test:
@@ -25,9 +26,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Use Node.js ${{ env.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.node-version }}
           cache: npm
@@ -42,9 +43,9 @@ jobs:
         run: npm pack
         working-directory: packages/${{ inputs.package-name }}
       - name: Upload tarball artifact
-        uses: actions/upload-artifact@v3.1.1
+        uses: actions/upload-artifact@v4
         with:
-          name: tarball
+          name: tarball-${{ inputs.react-version }}
           path: packages/${{ inputs.package-name }}/*.tgz
       - name: Build and test pages
         run: |
@@ -56,8 +57,9 @@ jobs:
       # Only run precommit after pages is built, because we hand-install tarball.
       - run: npm run precommit --if-present
       - name: Upload pages artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v3
         with:
+          name: github-pages-${{ inputs.react-version }}
           path: packages/pages/public
       - name: Run unit tests
         run: npm test
@@ -69,9 +71,9 @@ jobs:
 
     steps:
       - name: Download tarball artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: tarball
+          name: tarball-${{ inputs.react-version }}
       - name: Extract tarball to root
         run: tar -xvf ${{ inputs.package-name }}-*.tgz --strip-components=1
       - name: 'Sanity check: has LICENSE'
@@ -107,13 +109,13 @@ jobs:
           mv ./repo/packages/integration-test/ ./
           rm -r ./repo
       - name: Use Node.js ${{ env.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.node-version }}
       - name: Download tarball artifact
-        uses: actions/download-artifact@v3.0.1
+        uses: actions/download-artifact@v4
         with:
-          name: tarball
+          name: tarball-${{ inputs.react-version }}
           path: ./integration-test/
       - name: Run npm install
         run: npm install *.tgz
