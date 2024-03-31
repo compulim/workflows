@@ -45,7 +45,7 @@ jobs:
       - name: Upload tarball artifact
         uses: actions/upload-artifact@v4
         with:
-          name: tarball-${{ inputs.react-version }}
+          name: react-${{ inputs.react-version }}-tarball
           path: packages/${{ inputs.package-name }}/*.tgz
       - name: Build and test pages
         run: |
@@ -59,7 +59,7 @@ jobs:
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          name: github-pages-${{ inputs.react-version }}
+          name: react-${{ inputs.react-version }}-github-pages
           path: packages/pages/public
       - name: Run unit tests
         run: npm test
