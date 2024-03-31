@@ -6,6 +6,9 @@ on:
       package-name:
         required: true
         type: string
+      react-version:
+        required: false
+        type: string
       skip-integration-test:
         required: false
         type: boolean
@@ -31,6 +34,8 @@ jobs:
       - name: 'Sanity check: must from https://registry.npmjs.org/'
         run: cat ./package-lock.json | jq '.packages | with_entries(select(.value.link | not)) | with_entries(select(.value.resolved != null)) | with_entries(select(.value.resolved | startswith("https://registry.npmjs.org/") | not)) | if length > 0 then halt_error(1) else empty end'
       - run: npm clean-install
+      - if: inputs.react-version
+        run: npm run --if-present switch:react:{{ inputs.react-version }}
       - run: npm run build --if-present
       - name: Run npm pack
         run: npm pack
