@@ -36,7 +36,9 @@ jobs:
       - run: npm clean-install
       - if: inputs.react-version
         name: Use React ${{ inputs.react-version }}
-        run: npm run --if-present switch:react:${{ inputs.react-version }}
+        run: |
+          npm run --if-present switch:react:${{ inputs.react-version }}
+          npm install
       - run: npm run build --if-present
       - name: Run npm pack
         run: npm pack
