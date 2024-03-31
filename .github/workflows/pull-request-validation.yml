@@ -73,7 +73,7 @@ jobs:
       - name: Download tarball artifact
         uses: actions/download-artifact@v4
         with:
-          name: tarball-${{ inputs.react-version }}
+          name: react-${{ inputs.react-version }}-tarball
       - name: Extract tarball to root
         run: tar -xvf ${{ inputs.package-name }}-*.tgz --strip-components=1
       - name: 'Sanity check: has LICENSE'
@@ -115,7 +115,7 @@ jobs:
       - name: Download tarball artifact
         uses: actions/download-artifact@v4
         with:
-          name: tarball-${{ inputs.react-version }}
+          name: react-${{ inputs.react-version }}-tarball
           path: ./integration-test/
       - name: Run npm install
         run: npm install *.tgz
