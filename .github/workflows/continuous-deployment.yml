@@ -3,6 +3,10 @@ name: Continuous deployment
 on:
   workflow_call:
     inputs:
+      github-pages:
+        default: true
+        required: false
+        type: boolean
       package-name:
         required: true
         type: string
@@ -53,12 +57,14 @@ jobs:
         with:
           name: tarball
           path: packages/${{ inputs.package-name }}/*.tgz
-      - name: Build pages
+      - if: inputs.github-pages
+        name: Build pages
         run: |
           npm install ../${{ inputs.package-name }}/*.tgz
           npm run build
         working-directory: packages/pages
-      - name: Upload pages artifact
+      - if: inputs.github-pages
+        name: Upload pages artifact
         uses: actions/upload-pages-artifact@main
         with:
           path: packages/pages/public
@@ -158,6 +164,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    if: inputs.github-pages
     name: Publish to GitHub Pages
     needs: build
     permissions:
