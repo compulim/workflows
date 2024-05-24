@@ -64,6 +64,7 @@ jobs:
           path: packages/pages/public
 
   upload-changelog:
+    continue-on-error: true
     name: Upload changelog
     runs-on: ubuntu-latest
     steps:
@@ -72,7 +73,7 @@ jobs:
         run: pip install mdsplit
       - name: Extract CHANGELOG.md
         run: mdsplit CHANGELOG.md --max-level 2
-      - name: Display latest version
+      - name: Display latest version # TODO: We need to update this with a custom tool
         run: cat "$(ls ./CHANGELOG/**/[0-9]* -1 | tail -n 1)" | tee ./CHANGELOG.latest.md
       - name: Upload changelog
         uses: actions/upload-artifact@v3.1.1
@@ -129,7 +130,8 @@ jobs:
         with:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.PRIVATE_KEY }}
-      - name: Download changelog artifact
+      - continue-on-error: true # Partial changelog could be unavailable before first production release
+        name: Download changelog artifact
         uses: actions/download-artifact@v3.0.1
         with:
           name: changelog
