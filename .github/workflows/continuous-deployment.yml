@@ -22,12 +22,12 @@ jobs:
       version-type: ${{ steps.version-type.outputs.version-type }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout
       - id: version-type
         name: Determine version type
         run: 'if [[ "$(cat ./package.json | jq -r ''.version'')" == *-0 ]]; then echo version-type=prerelease | tee --append $GITHUB_OUTPUT; else echo version-type=production | tee --append $GITHUB_OUTPUT; fi'
       - name: Use Node.js ${{ env.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node
         with:
           node-version: ${{ env.node-version }}
           cache: npm
@@ -49,7 +49,7 @@ jobs:
         run: npm pack
         working-directory: packages/${{ inputs.package-name }}
       - name: Upload tarball artifact
-        uses: actions/upload-artifact@v3.1.1
+        uses: actions/upload-artifact
         with:
           name: tarball
           path: packages/${{ inputs.package-name }}/*.tgz
@@ -59,7 +59,7 @@ jobs:
           npm run build
         working-directory: packages/pages
       - name: Upload pages artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact
         with:
           path: packages/pages/public
 
@@ -68,7 +68,7 @@ jobs:
     name: Upload changelog
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout
       - name: Install mdsplit
         run: pip install mdsplit
       - name: Extract CHANGELOG.md
@@ -76,7 +76,7 @@ jobs:
       - name: Display latest version # TODO: We need to update this with a custom tool
         run: cat "$(ls ./CHANGELOG/**/[0-9]* -1 | tail -n 1)" | tee ./CHANGELOG.latest.md
       - name: Upload changelog
-        uses: actions/upload-artifact@v3.1.1
+        uses: actions/upload-artifact
         with:
           name: changelog
           path: ./CHANGELOG.latest.md
@@ -90,12 +90,12 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node
         with:
           node-version: ${{ env.node-version }}
           registry-url: https://registry.npmjs.org/
       - name: Download tarball artifact
-        uses: actions/download-artifact@v3.0.1
+        uses: actions/download-artifact
         with:
           name: tarball
       - id: package-json
@@ -132,11 +132,11 @@ jobs:
           private_key: ${{ secrets.PRIVATE_KEY }}
       - continue-on-error: true # Partial changelog could be unavailable before first production release
         name: Download changelog artifact
-        uses: actions/download-artifact@v3.0.1
+        uses: actions/download-artifact
         with:
           name: changelog
       - name: Download tarball artifact
-        uses: actions/download-artifact@v3.0.1
+        uses: actions/download-artifact
         with:
           name: tarball
       - env:
@@ -167,4 +167,4 @@ jobs:
     steps:
       - id: deployment
         name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages

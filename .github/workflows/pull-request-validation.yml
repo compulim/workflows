@@ -31,9 +31,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout
       - name: Use Node.js ${{ env.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node
         with:
           node-version: ${{ env.node-version }}
           cache: npm
@@ -48,7 +48,7 @@ jobs:
         run: npm pack
         working-directory: packages/${{ inputs.package-name }}
       - name: Upload tarball artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact
         with:
           name: tarball-${{ inputs.switch }}
           path: packages/${{ inputs.package-name }}/*.tgz
@@ -62,7 +62,7 @@ jobs:
       # Only run precommit after pages is built, because we hand-install tarball.
       - run: npm run precommit --if-present
       - name: Upload pages artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact
         with:
           name: github-pages-${{ inputs.switch }}
           path: packages/pages/public
@@ -76,7 +76,7 @@ jobs:
 
     steps:
       - name: Download tarball artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact
         with:
           name: tarball-${{ inputs.switch }}
       - name: Extract tarball to root
@@ -112,7 +112,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout
         with:
           path: ./repo
       - name: Isolate integration test
@@ -120,11 +120,11 @@ jobs:
           mv ./repo/packages/integration-test/ ./
           rm -r ./repo
       - name: Use Node.js ${{ env.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node
         with:
           node-version: ${{ env.node-version }}
       - name: Download tarball artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact
         with:
           name: tarball-${{ inputs.switch }}
           path: ./integration-test/
