@@ -41,7 +41,7 @@ jobs:
           cache: npm
       - if: steps.version-type.outputs.version-type != 'production'
         name: Run npx version-from-git --no-git-tag-version
-        run: npx version-from-git@latest --no-git-tag-version
+        run: npx version-from-git@main --no-git-tag-version
       - id: version
         name: Get version
         run: echo version=$(cat package.json | jq -r '.version') | tee --append $GITHUB_OUTPUT
