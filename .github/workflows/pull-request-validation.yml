@@ -104,7 +104,7 @@ jobs:
           shopt -s globstar
           ! compgen -G **/*.test.*
       - name: 'Sanity check: no production dependencies are pre-release'
-        run: cat package.json | jq '.dependencies | to_entries | map(.value | select(contains("-"))) | if length > 0 then halt_error(1) else empty end'
+        run: cat package.json | jq '(.dependencies // {}) | to_entries | map(.value | select(contains("-"))) | if length > 0 then halt_error(1) else empty end'
 
   integration-test:
     if: '!inputs.skip-integration-test'
