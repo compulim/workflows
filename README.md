@@ -36,7 +36,7 @@ This repository holds most reusable workflow for my own projects.
    - Benefits: don't deploy when some builds failed
    - Benefits: rerun failed builds/deployments
 - If you want to work with commits/tags
-   - `actions/checkout` with `fetch-depth: 0`
+   - `actions/checkout@main` with `fetch-depth: 0`
 - Eliminate CD workflow flakiness
    - Continuous deployment workflow is unlikely to be monitored
    - Do not run tests during continuous deployment
@@ -162,9 +162,9 @@ In contrast:
 echo abc=`jq -nr 'halt_error(1)'` # always return 0
 ```
 
-### Turns a GitHub Pages package into an artifact for `actions/upload-pages-artifact`
+### Turns a GitHub Pages package into an artifact for `actions/upload-pages-artifact@main`
 
-Build the `pages` package as part of `npm run build --workspaces`, then extract the tarball to use with `actions/upload-pages-artifact` with all default settings.
+Build the `pages` package as part of `npm run build --workspaces`, then extract the tarball to use with `actions/upload-pages-artifact@main` with all default settings.
 
 ```yml
 build-pages:
@@ -174,7 +174,7 @@ build-pages:
   runs-on: ubuntu-latest
   steps:
     - name: Download packages
-      uses: actions/download-artifact
+      uses: actions/download-artifact@main
       with:
         name: packages
     - name: Extract pages package
@@ -183,14 +183,14 @@ build-pages:
         tar --directory=./_site/ --extract --file=`ls -1 pages-[0-9]*.tgz` --strip-component=2 --verbose package/public
         ls -la ./_site/
     - name: Upload pages artifact
-      uses: actions/upload-pages-artifact
+      uses: actions/upload-pages-artifact@main
 ```
 
 ### Gets latest commitish of current folder
 
 This will get the latest commitish of everything under the current folder. It is useful to know if anything changed under this folder.
 
-Set `actions/checkout` with `fetch-depth: 0` to fetch all commits.
+Set `actions/checkout@main` with `fetch-depth: 0` to fetch all commits.
 
 ```sh
 COMMITTER_DATE=`git log --date=format:%Y%m%d-%H%M%S --pretty=format:'%cd' -1 ./`

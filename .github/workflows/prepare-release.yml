@@ -25,13 +25,13 @@ jobs:
         with:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.PRIVATE_KEY }}
-      - uses: actions/checkout
+      - uses: actions/checkout@main
       - name: Configure user profile
         run: |
           git config user.email "${{ format('@{0}', github.actor) }}"
           git config user.name "${{ format('@{0}', github.actor) }}"
       - name: Use Node.js ${{ env.node-version }}
-        uses: actions/setup-node
+        uses: actions/setup-node@main
         with:
           node-version: ${{ env.node-version }}
           cache: npm
