@@ -15,7 +15,7 @@ defaults:
     shell: bash
 
 env:
-  node-version: 18.x
+  node-version: lts
 
 jobs:
   publish-package:
