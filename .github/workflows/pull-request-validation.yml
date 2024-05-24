@@ -6,13 +6,13 @@ on:
       package-name:
         required: true
         type: string
-      react-version:
-        default: current
-        required: false
-        type: string
       skip-integration-test:
         required: false
         type: boolean
+      switch:
+        default: current
+        required: false
+        type: string
 
 defaults:
   run:
@@ -35,9 +35,9 @@ jobs:
       - name: 'Sanity check: must from https://registry.npmjs.org/'
         run: cat ./package-lock.json | jq '.packages | with_entries(select(.value.link | not)) | with_entries(select(.value.resolved != null)) | with_entries(select(.value.resolved | startswith("https://registry.npmjs.org/") | not)) | if length > 0 then halt_error(1) else empty end'
       - run: npm clean-install
-      - if: inputs.react-version && inputs.react-version != 'current'
-        name: Use React ${{ inputs.react-version }}
-        run: npm run --if-present switch:react:${{ inputs.react-version }}
+      - if: inputs.switch && inputs.switch != 'current'
+        name: Use switch "${{ inputs.switch }}"
+        run: npm run --if-present switch:${{ inputs.switch }}
       - run: npm run build --if-present
       - name: Run npm pack
         run: npm pack
@@ -45,7 +45,7 @@ jobs:
       - name: Upload tarball artifact
         uses: actions/upload-artifact@v4
         with:
-          name: react-${{ inputs.react-version }}-tarball
+          name: switch-${{ inputs.switch }}-tarball
           path: packages/${{ inputs.package-name }}/*.tgz
       - name: Build and test pages
         run: |
@@ -59,7 +59,7 @@ jobs:
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          name: react-${{ inputs.react-version }}-github-pages
+          name: switch-${{ inputs.switch }}-github-pages
           path: packages/pages/public
       - name: Run unit tests
         run: npm test
@@ -73,7 +73,7 @@ jobs:
       - name: Download tarball artifact
         uses: actions/download-artifact@v4
         with:
-          name: react-${{ inputs.react-version }}-tarball
+          name: switch-${{ inputs.switch }}-tarball
       - name: Extract tarball to root
         run: tar -xvf ${{ inputs.package-name }}-*.tgz --strip-components=1
       - name: 'Sanity check: has LICENSE'
@@ -121,7 +121,7 @@ jobs:
       - name: Download tarball artifact
         uses: actions/download-artifact@v4
         with:
-          name: react-${{ inputs.react-version }}-tarball
+          name: switch-${{ inputs.switch }}-tarball
           path: ./integration-test/
       - name: Run npm install
         run: npm install *.tgz
