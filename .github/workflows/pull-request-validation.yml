@@ -8,7 +8,7 @@ on:
         required: false
         type: boolean
       node-version:
-        default: 20.x
+        default: lts/*
         required: false
         type: string
       package-name:
