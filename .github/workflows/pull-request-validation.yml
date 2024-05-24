@@ -3,6 +3,10 @@ name: Pull request validation
 on:
   workflow_call:
     inputs:
+      node-version:
+        default: 20.x
+        required: false
+        type: string
       package-name:
         required: true
         type: string
@@ -19,7 +23,8 @@ defaults:
     shell: bash
 
 env:
-  node-version: 18.x
+  # In the future, we should infer it from "switch: node-20".
+  node-version: ${{ inputs.node-version }}
 
 jobs:
   build:
