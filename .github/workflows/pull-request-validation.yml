@@ -50,7 +50,7 @@ jobs:
       - name: Upload tarball artifact
         uses: actions/upload-artifact@v4
         with:
-          name: switch-${{ inputs.switch }}-tarball
+          name: tarball-${{ inputs.switch }}
           path: packages/${{ inputs.package-name }}/*.tgz
       - name: Build and test pages
         run: |
@@ -64,7 +64,7 @@ jobs:
       - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          name: switch-${{ inputs.switch }}-github-pages
+          name: github-pages-${{ inputs.switch }}
           path: packages/pages/public
       - name: Run unit tests
         run: npm test
@@ -78,7 +78,7 @@ jobs:
       - name: Download tarball artifact
         uses: actions/download-artifact@v4
         with:
-          name: switch-${{ inputs.switch }}-tarball
+          name: tarball-${{ inputs.switch }}
       - name: Extract tarball to root
         run: tar -xvf ${{ inputs.package-name }}-*.tgz --strip-components=1
       - name: 'Sanity check: has LICENSE'
@@ -126,7 +126,7 @@ jobs:
       - name: Download tarball artifact
         uses: actions/download-artifact@v4
         with:
-          name: switch-${{ inputs.switch }}-tarball
+          name: tarball-${{ inputs.switch }}
           path: ./integration-test/
       - name: Run npm install
         run: npm install *.tgz
