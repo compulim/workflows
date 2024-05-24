@@ -8,7 +8,7 @@ defaults:
     shell: bash
 
 env:
-  node-version: latest
+  node-version: current
 
 jobs:
   list-outdated:
