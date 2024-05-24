@@ -7,6 +7,10 @@ on:
         default: true
         required: false
         type: boolean
+      node-version:
+        default: lts/*
+        required: false
+        type: string
       package-name:
         required: true
         type: string
@@ -16,7 +20,7 @@ defaults:
     shell: bash
 
 env:
-  node-version: lts/*
+  node-version: ${{ inputs.node-version }}
 
 jobs:
   build:
