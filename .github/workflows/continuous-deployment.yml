@@ -73,7 +73,7 @@ jobs:
         with:
           path: packages/pages/public
       - name: Generate SBOM
-        uses: anchore/sbom-action@v0.16
+        uses: anchore/sbom-action@v0
         with:
           output-file: sbom.spdx.json
           path: packages/${{ inputs.package-name }}/
