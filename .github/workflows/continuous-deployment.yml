@@ -181,6 +181,10 @@ jobs:
         uses: actions/download-artifact@main
         with:
           name: changelog
+      - name: Download SBOM artifact
+        uses: actions/download-artifact@main
+        with:
+          name: sbom
       - name: Download tarball artifact
         uses: actions/download-artifact@main
         with:
@@ -198,7 +202,7 @@ jobs:
       - env:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
         name: Upload assets
-        run: gh release upload ${{ steps.release.outputs.tag }} *.tgz --repo ${{ github.repository }}
+        run: gh release upload ${{ steps.release.outputs.tag }} *.tgz sbom.spdx.json --repo ${{ github.repository }}
 
   publish-pages:
     environment:
