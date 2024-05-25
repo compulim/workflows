@@ -72,6 +72,18 @@ jobs:
         uses: actions/upload-pages-artifact@main
         with:
           path: packages/pages/public
+      - name: Generate SBOM
+        uses: anchore/sbom-action@v0.16
+        with:
+          output-file: sbom.spdx.json
+          path: packages/${{ inputs.package-name }}/
+          upload-artifact: false
+          upload-release-assets: false
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@main
+        with:
+          name: sbom
+          path: ./sbom.spdx.json
 
   sign-build-attestations:
     name: Sign build attestations
@@ -86,9 +98,16 @@ jobs:
         uses: actions/download-artifact@main
         with:
           name: tarball
-      - uses: actions/attest-build-provenance@v1
+      - name: Download SBOM artifact
+        uses: actions/download-artifact@main
         with:
-          subject-path: '*.tgz'
+          name: sbom
+      - uses: actions/attest-build-provenance@main
+        with:
+          subject-path: './*.tgz'
+      - uses: actions/attest-sbom@main
+        with:
+          sbom-path: './sbom.spdx.json'
 
   upload-changelog:
     continue-on-error: true
