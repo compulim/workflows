@@ -22,9 +22,6 @@ defaults:
 env:
   node-version: ${{ inputs.node-version }}
 
-permissions:
-  attestations: write
-
 jobs:
   build:
     name: Build
