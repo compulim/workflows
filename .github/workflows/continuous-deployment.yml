@@ -84,8 +84,8 @@ jobs:
           name: sbom
           path: ./sbom.spdx.json
 
-  sign-build-attestations:
-    name: Sign build attestations
+  sign-attestations:
+    name: Sign attestations
     needs:
       - build
     runs-on: ubuntu-latest
