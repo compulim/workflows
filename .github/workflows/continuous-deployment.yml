@@ -108,6 +108,7 @@ jobs:
       - uses: actions/attest-sbom@main
         with:
           sbom-path: './sbom.spdx.json'
+          subject-path: './*.tgz'
 
   upload-changelog:
     continue-on-error: true
