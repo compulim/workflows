@@ -1,4 +1,5 @@
 {
+  "private": true,
   "scripts": {
     "bump": "npm run bump:prod && npm run bump:dev && npm run bump:auditfix",
     "bump:auditfix": "npm audit fix || exit 0",
