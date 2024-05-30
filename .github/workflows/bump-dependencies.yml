@@ -56,11 +56,41 @@ jobs:
           npm exec --include-workspace-root --workspaces --call 'git show HEAD:./package.json | jd -f=merge ./package.json | jq -s ".[0] // {}" > /tmp/package-jd.json && jq ". * input" /tmp/package-jd.json /tmp/package-merge.json > /tmp/package-merge.json.tmp && mv /tmp/package-merge.json.tmp /tmp/package-merge.json'
 
           cat /tmp/package-merge.json
-      - id: pull-request
-        run: echo pull-request-number=123 | tee --append $GITHUB_OUTPUT
+      - name: Create branch
+        id: branch
+        run: |
+          BRANCH_NAME=bot/bump-deps/${{ github.run_number }}
+          git checkout -b $BRANCH_NAME
+
+          echo branch-name=$BRANCH_NAME | tee --append $GITHUB_OUTPUT
+      - name: Stage changes
+        run: git add --all
+      - name: Commit changes
+        run: git commit --message "Bump dependencies"
+      - name: Push changes
+        run: git push --set-upstream origin ${{ steps.branch.outputs.branch-name }}
+      - continue-on-error: true
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+        id: pull-request
+        name: Create pull request
+        run: |
+          gh api repos/${{ github.repository }}/pulls \
+            --field base=main \
+            --field head=${{ steps.branch.outputs.branch-name }} \
+            --field title="Bump dependencies" \
+            | tee /tmp/output.json
+          echo pull-request-number=$(cat /tmp/output.json | jq -r .number) | tee --append $GITHUB_OUTPUT
+      - continue-on-error: true
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+        name: Assign pull request ${{ steps.pull-request.outputs.pull-request-number }} to ${{ github.actor }}
+        run: |
+          gh api repos/${{ github.repository }}/issues/${{ steps.pull-request.outputs.pull-request-number }}/assignees \
+            --field assignees[]=${{ github.actor }}
       - name: Build pull request body
         run: |
-          printf "> Created in [workflow run ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).\n\n## Changelog\n\n### Changed\n\n- Bumped dependencies, in PR [#${{ steps.pull-request.outputs.pull-request-number }}](${{ github.server_url }}/${{ github.repository }}/pull/${{ steps.pull-request.outputs.pull-request-number }})" | tee /tmp/pull-request-body.txt
+          echo -e "> Created in [workflow run ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).\n\n## Changelog\n\n### Changed\n\n- Bumped dependencies, in PR [#${{ steps.pull-request.outputs.pull-request-number }}](${{ github.server_url }}/${{ github.repository }}/pull/${{ steps.pull-request.outputs.pull-request-number }})" | tee /tmp/pull-request-body.txt
 
           echo "   - Production dependencies" | tee --append /tmp/pull-request-body.txt
           cat /tmp/package-merge.json | jq -r '.dependencies | to_entries | sort_by(.) | .[] | (.value | ltrimstr("^")) as $V | "      - [`" + .key + "@" + $V + "`](https://npmjs.com/package/" + .key + "/v/" + $V + ")"' | tee --append /tmp/pull-request-body.txt
@@ -71,44 +101,10 @@ jobs:
           echo ---
 
           cat /tmp/pull-request-body.txt
-
-      # - name: Create branch
-      #   id: branch
-      #   run: |
-      #     BRANCH_NAME=bot/bump-deps/${{ github.run_number }}
-      #     git checkout -b $BRANCH_NAME
-
-      #     echo branch-name=$BRANCH_NAME | tee --append $GITHUB_OUTPUT
-      # - name: Stage changes
-      #   run: git add --all
-      # - name: Commit changes
-      #   run: git commit --message "Bump dependencies"
-      # - name: Push changes
-      #   run: git push --set-upstream origin ${{ steps.branch.outputs.branch-name }}
-      # - continue-on-error: true
-      #   env:
-      #     GH_TOKEN: ${{ steps.generate-token.outputs.token }}
-      #   id: pull-request
-      #   name: Create pull request
-      #   run: |
-      #     gh api repos/${{ github.repository }}/pulls \
-      #       --field base=main \
-      #       --field body="> Created in [workflow run ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})." \
-      #       --field head=${{ steps.branch.outputs.branch-name }} \
-      #       --field title="Bump dependencies" \
-      #       | tee /tmp/output.json
-      #     echo pull-request-number=$(cat /tmp/output.json | jq -r .number) | tee --append $GITHUB_OUTPUT
-      # - continue-on-error: true
-      #   env:
-      #     GH_TOKEN: ${{ steps.generate-token.outputs.token }}
-      #   name: Assign pull request ${{ steps.pull-request.outputs.pull-request-number }} to ${{ github.actor }}
-      #   run: |
-      #     gh api repos/${{ github.repository }}/issues/${{ steps.pull-request.outputs.pull-request-number }}/assignees \
-      #       --field assignees[]=${{ github.actor }}
-      # - continue-on-error: true
-      #   env:
-      #     GH_TOKEN: ${{ steps.generate-token.outputs.token }}
-      #   name: Update pull request body
-      #   run: |
-      #     gh api repos/${{ github.repository }}/pulls/${{ steps.pull-request.outputs.pull-request-number }} \
-      #       --field body=@/tmp/pull-request-body.txt
+      - continue-on-error: true
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+        name: Update pull request body
+        run: |
+          gh api repos/${{ github.repository }}/pulls/${{ steps.pull-request.outputs.pull-request-number }} \
+            --field body=@/tmp/pull-request-body.txt
