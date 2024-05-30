@@ -47,7 +47,7 @@ jobs:
         run: |
           # Using jd from https://github.com/josephburnett/jd
           echo {} > /tmp/package-merge.json
-          npm exec --include-workspace-root --workspaces --call 'git show HEAD:./package.json | docker run --rm -i -v $PWD:$PWD -w $PWD josephburnett/jd "$@" ./package.json /tmp/package-merge.json -f=merge | tee /tmp/package-merge.json.tmp && mv /tmp/package-merge.json.tmp /tmp/package-merge.json'
+          npm exec --include-workspace-root --workspaces --call 'git show HEAD:./package.json | docker run --rm -i -v $PWD:$PWD -w $PWD josephburnett/jd -f=merge ./package.json /tmp/package-merge.json | tee /tmp/package-merge.json.tmp && mv /tmp/package-merge.json.tmp /tmp/package-merge.json'
           cat /tmp/package-merge.json
       # - name: Create branch
       #   id: branch
