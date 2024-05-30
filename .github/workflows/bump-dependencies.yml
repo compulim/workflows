@@ -46,16 +46,32 @@ jobs:
           go-version: stable
       - run: npm clean-install
       - run: npm run bump
-      - name: Print diff
+      - name: Prepare pull request body
         run: |
           # Using jd from https://github.com/josephburnett/jd
           go install github.com/josephburnett/jd@latest
 
           echo {} > /tmp/package-merge.json
 
-          npm exec --include-workspace-root --workspaces --call 'git show HEAD:./package.json | jd -f=merge ./package.json | jq -s ".[0] // {}" | tee /tmp/package-jd.json && jq ". * input" /tmp/package-jd.json /tmp/package-merge.json | tee /tmp/package-merge.json.tmp && mv /tmp/package-merge.json.tmp /tmp/package-merge.json'
+          npm exec --include-workspace-root --workspaces --call 'git show HEAD:./package.json | jd -f=merge ./package.json | jq -s ".[0] // {}" > /tmp/package-jd.json && jq ". * input" /tmp/package-jd.json /tmp/package-merge.json > /tmp/package-merge.json.tmp && mv /tmp/package-merge.json.tmp /tmp/package-merge.json'
 
           cat /tmp/package-merge.json
+
+          echo "> Created in [workflow run ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})." | tee --append /tmp/pull-request-body.txt
+          echo | tee --append /tmp/pull-request-body.txt
+          echo "## Changelog" | tee --append /tmp/pull-request-body.txt
+          echo | tee --append /tmp/pull-request-body.txt
+          echo "### Changed" | tee --append /tmp/pull-request-body.txt
+          echo | tee --append /tmp/pull-request-body.txt
+          echo "   - Production dependencies" | tee --append /tmp/pull-request-body.txt
+          jq -r '.dependencies | to_entries | sort_by(.) | map("      - [`" + .key + "@" + (.value | ltrimstr("^")) + "`](https://npmjs.com/package/" + .key + ")") | .[]' | tee --append /tmp/pull-request-body.txt
+          echo "   - Development dependencies" | tee --append /tmp/pull-request-body.txt
+          jq -r '.devDependencies | to_entries | sort_by(.) | map("      - [`" + .key + "@" + (.value | ltrimstr("^")) + "`](https://npmjs.com/package/" + .key + ")") | .[]' | tee --append /tmp/pull-request-body.txt
+
+          echo ---
+
+          cat /tmp/pull-request-body.txt
+
       # - name: Create branch
       #   id: branch
       #   run: |
