@@ -43,36 +43,44 @@ jobs:
           cache: npm
       - run: npm clean-install
       - run: npm run bump
-      - name: Create branch
-        id: branch
+      - name: Install jd
+        run: go install github.com/josephburnett/jd@latest
+      - name: Merge diff into single file
         run: |
-          BRANCH_NAME=bot/bump-deps/${{ github.run_number }}
-          git checkout -b $BRANCH_NAME
+          echo {} > /tmp/package-merge.json
+          npm exec --include-workspace-root --workspaces -c 'git show HEAD:./package.json | jd ./package.json /tmp/package-merge.json -f=merge | tee /tmp/package-merge.json.tmp && mv /tmp/package-merge.json.tmp /tmp/package-merge.json'
+      - name: Print result
+        run: cat /tmp/package-merge.json
+      # - name: Create branch
+      #   id: branch
+      #   run: |
+      #     BRANCH_NAME=bot/bump-deps/${{ github.run_number }}
+      #     git checkout -b $BRANCH_NAME
 
-          echo branch-name=$BRANCH_NAME | tee --append $GITHUB_OUTPUT
-      - name: Stage changes
-        run: git add --all
-      - name: Commit changes
-        run: git commit --message "Bump dependencies"
-      - name: Push changes
-        run: git push --set-upstream origin ${{ steps.branch.outputs.branch-name }}
-      - continue-on-error: true
-        env:
-          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
-        id: pull-request
-        name: Create pull request
-        run: |
-          gh api repos/${{ github.repository }}/pulls \
-            --field base=main \
-            --field body="> Created in [workflow run ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})." \
-            --field head=${{ steps.branch.outputs.branch-name }} \
-            --field title="Bump dependencies" \
-            | tee /tmp/output.json
-          echo pull-request-number=$(cat /tmp/output.json | jq -r .number) | tee --append $GITHUB_OUTPUT
-      - continue-on-error: true
-        env:
-          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
-        name: Assign pull request ${{ steps.pull-request.outputs.pull-request-number }} to ${{ github.actor }}
-        run: |
-          gh api repos/${{ github.repository }}/issues/${{ steps.pull-request.outputs.pull-request-number }}/assignees \
-            --field assignees[]=${{ github.actor }}
+      #     echo branch-name=$BRANCH_NAME | tee --append $GITHUB_OUTPUT
+      # - name: Stage changes
+      #   run: git add --all
+      # - name: Commit changes
+      #   run: git commit --message "Bump dependencies"
+      # - name: Push changes
+      #   run: git push --set-upstream origin ${{ steps.branch.outputs.branch-name }}
+      # - continue-on-error: true
+      #   env:
+      #     GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+      #   id: pull-request
+      #   name: Create pull request
+      #   run: |
+      #     gh api repos/${{ github.repository }}/pulls \
+      #       --field base=main \
+      #       --field body="> Created in [workflow run ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})." \
+      #       --field head=${{ steps.branch.outputs.branch-name }} \
+      #       --field title="Bump dependencies" \
+      #       | tee /tmp/output.json
+      #     echo pull-request-number=$(cat /tmp/output.json | jq -r .number) | tee --append $GITHUB_OUTPUT
+      # - continue-on-error: true
+      #   env:
+      #     GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+      #   name: Assign pull request ${{ steps.pull-request.outputs.pull-request-number }} to ${{ github.actor }}
+      #   run: |
+      #     gh api repos/${{ github.repository }}/issues/${{ steps.pull-request.outputs.pull-request-number }}/assignees \
+      #       --field assignees[]=${{ github.actor }}
