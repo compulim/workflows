@@ -43,14 +43,12 @@ jobs:
           cache: npm
       - run: npm clean-install
       - run: npm run bump
-      - name: Install jd
-        run: go install github.com/josephburnett/jd@latest
-      - name: Merge diff into single file
+      - name: Print diff
         run: |
+          go install github.com/josephburnett/jd@latest
           echo {} > /tmp/package-merge.json
           npm exec --include-workspace-root --workspaces -c 'git show HEAD:./package.json | jd ./package.json /tmp/package-merge.json -f=merge | tee /tmp/package-merge.json.tmp && mv /tmp/package-merge.json.tmp /tmp/package-merge.json'
-      - name: Print result
-        run: cat /tmp/package-merge.json
+          cat /tmp/package-merge.json
       # - name: Create branch
       #   id: branch
       #   run: |
