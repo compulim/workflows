@@ -89,22 +89,6 @@ jobs:
           done
         working-directory: ./template/scaffold/
 
-      - name: Remove React in Babel config
-        if: '!inputs.use-react'
-        run: |
-          # Remove @babel/preset-react from babel.config.json/presets
-
-          for i in $(ls -1 babel.*.json)
-          do
-            echo --- $i
-
-            cat $i | jq -r '. | (if .presets then .presets |= map(select((. == "@babel/preset-react" or (. | type == "array" and .[0] == "@babel/preset-react") | not))) else . end)' | tee /tmp/output.tmp
-            mv /tmp/output.tmp $i
-
-            echo
-          done
-        working-directory: ./template/scaffold/copy/packages/${{ inputs.package-name }}/
-
       - name: Remove React in Jest config
         if: '!inputs.use-react'
         run: |
