@@ -60,21 +60,13 @@ jobs:
         run: echo pull-request-number=123 | tee --append $GITHUB_OUTPUT
       - name: Build pull request body
         run: |
-          cat << EOF
-          > Created in [workflow run ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
-
-          ## Changelog
-
-          ### Changed
-
-          - Bumped dependencies, in PR [#${{ steps.pull-request.outputs.pull-request-number }}](${{ github.server_url }}/${{ github.repository }}/pull/${{ steps.pull-request.outputs.pull-request-number }})
-          EOF | tee /tmp/pull-request-body.txt
+          echo -e "> Created in [workflow run ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).\n\n## Changelog\n\n### Changed\n\n- Bumped dependencies, in PR [#${{ steps.pull-request.outputs.pull-request-number }}](${{ github.server_url }}/${{ github.repository }}/pull/${{ steps.pull-request.outputs.pull-request-number }})" | tee /tmp/pull-request-body.txt
 
           echo "   - Production dependencies" | tee --append /tmp/pull-request-body.txt
-          cat /tmp/package-merge.json | jq -r '.dependencies | to_entries | sort_by(.) | map("      - [`" + .key + "@" + (.value | ltrimstr("^")) + "`](https://npmjs.com/package/" + .key + ")") | .[]' | tee --append /tmp/pull-request-body.txt
+          cat /tmp/package-merge.json | jq -r '.dependencies | to_entries | sort_by(.) | map("      - [`" + .key + "@" + (.value | ltrimstr("^")) + "`](https://npmjs.com/package/" + .key + "/v/" + .value + ")") | .[]' | tee --append /tmp/pull-request-body.txt
 
           echo "   - Development dependencies" | tee --append /tmp/pull-request-body.txt
-          cat /tmp/package-merge.json | jq -r '.devDependencies | to_entries | sort_by(.) | map("      - [`" + .key + "@" + (.value | ltrimstr("^")) + "`](https://npmjs.com/package/" + .key + ")") | .[]' | tee --append /tmp/pull-request-body.txt
+          cat /tmp/package-merge.json | jq -r '.devDependencies | to_entries | sort_by(.) | map("      - [`" + .key + "@" + (.value | ltrimstr("^")) + "`](https://npmjs.com/package/" + .key + "/v/" + .value + ")") | .[]' | tee --append /tmp/pull-request-body.txt
 
           echo ---
 
