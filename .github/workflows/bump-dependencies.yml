@@ -53,7 +53,7 @@ jobs:
 
           echo {} > /tmp/package-merge.json
 
-          npm exec --include-workspace-root --workspaces --call 'git show HEAD:./package.json > /tmp/package-original.json && jd -f=merge /tmp/package-original.json ./package.json | jq -s ".[0] // {}" > /tmp/package-jd.json && jq -s 'if .[0].private then { devDependencies: ((.[1].dependencies // {}) + (.[1].devDependencies // {})) } else .[1] end' ./package.json /tmp/package-jd.json > /tmp/package-jd-normalized.json && jq ". * input" /tmp/package-jd-normalized.json /tmp/package-merge.json > /tmp/package-merge.json.tmp && mv /tmp/package-merge.json.tmp /tmp/package-merge.json'
+          npm exec --include-workspace-root --workspaces --call 'git show HEAD:./package.json > /tmp/package-original.json && jd -f=merge /tmp/package-original.json ./package.json | jq -s ".[0] // {}" > /tmp/package-jd.json && jq -s "if .[0].private then { devDependencies: ((.[1].dependencies // {}) + (.[1].devDependencies // {})) } else .[1] end" ./package.json /tmp/package-jd.json > /tmp/package-jd-normalized.json && jq ". * input" /tmp/package-jd-normalized.json /tmp/package-merge.json > /tmp/package-merge.json.tmp && mv /tmp/package-merge.json.tmp /tmp/package-merge.json'
 
           cat /tmp/package-merge.json
       # - name: Create branch
