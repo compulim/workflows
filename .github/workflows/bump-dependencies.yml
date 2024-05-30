@@ -51,9 +51,9 @@ jobs:
           # Using jd from https://github.com/josephburnett/jd
           go install github.com/josephburnett/jd@latest
 
-          echo {} > ./package-merge.json
-          npm exec --include-workspace-root --workspaces --call 'git show HEAD:./package.json | jd -f=merge ./package.json ./package-merge.json | tee ./package-merge.json.tmp && mv ./package-merge.json.tmp ./package-merge.json'
-          cat ./package-merge.json
+          echo {} > /tmp/package-merge.json
+          npm exec --include-workspace-root --workspaces --call 'git show HEAD:./package.json | jd -f=merge ./package.json /tmp/package-merge.json | tee /tmp/package-merge.json.tmp && mv /tmp/package-merge.json.tmp /tmp/package-merge.json'
+          cat /tmp/package-merge.json
       # - name: Create branch
       #   id: branch
       #   run: |
