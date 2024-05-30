@@ -46,8 +46,9 @@ jobs:
       - name: Print diff
         run: |
           # Using jd from https://github.com/josephburnett/jd
-          echo {} > package-merge.json
-          npm exec --include-workspace-root --workspaces --call 'git show HEAD:./package.json | docker run --rm -i -v $PWD:$PWD -w $PWD josephburnett/jd -f=merge ./package.json ./package-merge.json | tee ./package-merge.json.tmp && mv ./package-merge.json.tmp ./package-merge.json'
+          brew install jd
+          echo {} > ./package-merge.json
+          npm exec --include-workspace-root --workspaces --call 'git show HEAD:./package.json | jd -f=merge ./package.json ./package-merge.json | tee ./package-merge.json.tmp && mv ./package-merge.json.tmp ./package-merge.json'
           cat ./package-merge.json
       # - name: Create branch
       #   id: branch
