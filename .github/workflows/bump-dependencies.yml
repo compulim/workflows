@@ -41,9 +41,9 @@ jobs:
         with:
           node-version: ${{ env.node-version }}
           cache: npm
-      - uses: actions/setup-go@v5
-        with:
-          go-version: stable
+      # - uses: actions/setup-go@v5
+      #   with:
+      #     go-version: stable
       - run: npm clean-install
       - run: npm run bump
       - name: Print diff
@@ -53,9 +53,7 @@ jobs:
 
           echo {} > /tmp/package-merge.json
 
-          npm exec --include-workspace-root --workspaces --call 'git show HEAD:./package.json | jd -f=merge ./package.json | tee /tmp/package-jd.json'
-
-          npm exec --include-workspace-root --workspaces --call 'git show HEAD:./package.json | jd -f=merge ./package.json | tee /tmp/package-jd.json && jq ". * input" /tmp/package-jd.json /tmp/package-merge.json | tee /tmp/package-merge.json.tmp && mv /tmp/package-merge.json.tmp /tmp/package-merge.json'
+          npm exec --include-workspace-root --workspaces --call 'git show HEAD:./package.json | jd -f=merge ./package.json | jq -s ".[0] // {}" | tee /tmp/package-jd.json && jq ". * input" /tmp/package-jd.json /tmp/package-merge.json | tee /tmp/package-merge.json.tmp && mv /tmp/package-merge.json.tmp /tmp/package-merge.json'
 
           cat /tmp/package-merge.json
       # - name: Create branch
