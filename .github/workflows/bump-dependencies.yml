@@ -46,7 +46,7 @@ jobs:
           go-version: stable
       - run: npm clean-install
       - run: npm run bump
-      - name: Prepare pull request body
+      - name: Diff changes
         run: |
           # Using jd from https://github.com/josephburnett/jd
           go install github.com/josephburnett/jd@latest
@@ -56,17 +56,25 @@ jobs:
           npm exec --include-workspace-root --workspaces --call 'git show HEAD:./package.json | jd -f=merge ./package.json | jq -s ".[0] // {}" > /tmp/package-jd.json && jq ". * input" /tmp/package-jd.json /tmp/package-merge.json > /tmp/package-merge.json.tmp && mv /tmp/package-merge.json.tmp /tmp/package-merge.json'
 
           cat /tmp/package-merge.json
+      - id: pull-request
+        run: echo pull-request-number=123 | tee --append $GITHUB_OUTPUT
+      - name: Build pull request body
+        run: |
+          cat << EOF
+          > Created in [workflow run ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
 
-          echo "> Created in [workflow run ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})." | tee --append /tmp/pull-request-body.txt
-          echo | tee --append /tmp/pull-request-body.txt
-          echo "## Changelog" | tee --append /tmp/pull-request-body.txt
-          echo | tee --append /tmp/pull-request-body.txt
-          echo "### Changed" | tee --append /tmp/pull-request-body.txt
-          echo | tee --append /tmp/pull-request-body.txt
+          ## Changelog
+
+          ### Changed
+
+          - Bumped dependencies, in PR [#${{ steps.pull-request.outputs.pull-request-number }}](${{ github.server_url }}/${{ github.repository }}/pull/${{ steps.pull-request.outputs.pull-request-number }})
+          EOF | tee /tmp/pull-request-body.txt
+
           echo "   - Production dependencies" | tee --append /tmp/pull-request-body.txt
-          jq -r '.dependencies | to_entries | sort_by(.) | map("      - [`" + .key + "@" + (.value | ltrimstr("^")) + "`](https://npmjs.com/package/" + .key + ")") | .[]' | tee --append /tmp/pull-request-body.txt
+          cat /tmp/package-merge.json | jq -r '.dependencies | to_entries | sort_by(.) | map("      - [`" + .key + "@" + (.value | ltrimstr("^")) + "`](https://npmjs.com/package/" + .key + ")") | .[]' | tee --append /tmp/pull-request-body.txt
+
           echo "   - Development dependencies" | tee --append /tmp/pull-request-body.txt
-          jq -r '.devDependencies | to_entries | sort_by(.) | map("      - [`" + .key + "@" + (.value | ltrimstr("^")) + "`](https://npmjs.com/package/" + .key + ")") | .[]' | tee --append /tmp/pull-request-body.txt
+          cat /tmp/package-merge.json | jq -r '.devDependencies | to_entries | sort_by(.) | map("      - [`" + .key + "@" + (.value | ltrimstr("^")) + "`](https://npmjs.com/package/" + .key + ")") | .[]' | tee --append /tmp/pull-request-body.txt
 
           echo ---
 
