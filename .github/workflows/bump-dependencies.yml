@@ -45,7 +45,8 @@ jobs:
       - run: npm run bump
       - name: Print diff
         run: |
-          go install github.com/josephburnett/jd@latest
+          # https://github.com/josephburnett/jd
+          jd() { docker run --rm -i -v $PWD:$PWD -w $PWD josephburnett/jd "$@"; }
           echo {} > /tmp/package-merge.json
           npm exec --include-workspace-root --workspaces -c 'git show HEAD:./package.json | jd ./package.json /tmp/package-merge.json -f=merge | tee /tmp/package-merge.json.tmp && mv /tmp/package-merge.json.tmp /tmp/package-merge.json'
           cat /tmp/package-merge.json
