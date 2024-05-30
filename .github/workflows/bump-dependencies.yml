@@ -41,9 +41,9 @@ jobs:
         with:
           node-version: ${{ env.node-version }}
           cache: npm
-      # - uses: actions/setup-go@v5
-      #   with:
-      #     go-version: stable
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
       - run: npm clean-install
       - run: npm run bump
       - name: Print diff
