@@ -41,12 +41,16 @@ jobs:
         with:
           node-version: ${{ env.node-version }}
           cache: npm
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
       - run: npm clean-install
       - run: npm run bump
       - name: Print diff
         run: |
           # Using jd from https://github.com/josephburnett/jd
-          brew install jd
+          go install github.com/josephburnett/jd@latest
+
           echo {} > ./package-merge.json
           npm exec --include-workspace-root --workspaces --call 'git show HEAD:./package.json | jd -f=merge ./package.json ./package-merge.json | tee ./package-merge.json.tmp && mv ./package-merge.json.tmp ./package-merge.json'
           cat ./package-merge.json
