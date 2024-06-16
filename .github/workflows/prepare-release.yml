@@ -1,7 +1,17 @@
 name: Prepare release
 
 on:
-  workflow_call: {}
+  workflow_call:
+    inputs:
+      version-to-bump:
+        default: patch
+        description: Version to bump
+        options:
+          - major
+          - minor
+          - patch
+        required: true
+        type: choice
 
 defaults:
   run:
@@ -37,7 +47,7 @@ jobs:
           cache: npm
       - id: version
         run: |
-          npm version patch --no-git-tag-version
+          npm version ${{ inputs.version-to-bump }} --no-git-tag-version
 
           echo version=$(cat package.json | jq -r .version) | tee --append $GITHUB_OUTPUT
       - name: Create branch
