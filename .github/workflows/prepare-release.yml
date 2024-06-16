@@ -4,6 +4,7 @@ on:
   workflow_call:
     inputs:
       version-to-bump:
+        default: patch
         description: Version to bump
         required: true
         type: string
