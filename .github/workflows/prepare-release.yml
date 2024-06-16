@@ -4,14 +4,9 @@ on:
   workflow_call:
     inputs:
       version-to-bump:
-        default: patch
         description: Version to bump
-        options:
-          - major
-          - minor
-          - patch
         required: true
-        type: choice
+        type: string
 
 defaults:
   run:
