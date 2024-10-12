@@ -82,7 +82,7 @@ jobs:
         name: Generate CHANGELOG.md
         uses: compulim/generate-bump-changelog-action@v0.0.1
         with:
-          change-file: /tmp/change.txt
+          change-path: /tmp/change.txt
           pull-request-number: ${{ steps.pull-request.outputs.pull-request-number }}
       - name: Stage changes to CHANGELOG.md
         run: git add CHANGELOG.md
@@ -93,7 +93,14 @@ jobs:
       - continue-on-error: true
         name: Build pull request body
         run: |
-          echo -e "> Created in [workflow run ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).\n\n## Changelog\n\n### Changed\n\n" | tee /tmp/pull-request-body.txt
+          cat <<EOF | tee /tmp/pull-request-body.txt
+          > Created in [workflow run ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+
+          ## Changelog
+
+          ### Changed
+
+          EOF
 
           cat /tmp/change.txt | tee --append /tmp/pull-request-body.txt
       - continue-on-error: true
