@@ -78,6 +78,13 @@ jobs:
         run: |
           gh api repos/${{ github.repository }}/issues/${{ steps.pull-request.outputs.pull-request-number }}/assignees \
             --field assignees[]=${{ github.actor }}
+      - name: Debug
+        run: |
+          cat package.json
+
+          echo ---
+
+          git show origin/main:package.json
       - id: generate-changelog
         name: Generate CHANGELOG.md
         uses: compulim/generate-bump-changelog-action@v0.0.1
