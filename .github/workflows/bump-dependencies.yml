@@ -87,12 +87,14 @@ jobs:
         run: git add CHANGELOG.md
       - name: Commit CHANGELOG.md
         run: git commit --message "Add bump dependencies entry"
+      - name: Push changes of CHANGELOG.md
+        run: git push
       - continue-on-error: true
         name: Build pull request body
         run: |
           echo -e "> Created in [workflow run ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).\n\n## Changelog\n\n### Changed\n\n- Bumped dependencies, in PR [#${{ steps.pull-request.outputs.pull-request-number }}](${{ github.server_url }}/${{ github.repository }}/pull/${{ steps.pull-request.outputs.pull-request-number }})" | tee /tmp/pull-request-body.txt
 
-          echo ${{ steps.generate-changelog.outputs.changelog }} | tee --append /tmp/pull-request-body.txt
+          echo "${{ steps.generate-changelog.outputs.changelog }}" | tee --append /tmp/pull-request-body.txt
 
           echo ---
 
