@@ -46,6 +46,7 @@ jobs:
           go-version: stable
       - run: npm clean-install
       - run: npm run bump
+      - run: npm audit fix
       - name: Create branch
         id: branch
         run: |
