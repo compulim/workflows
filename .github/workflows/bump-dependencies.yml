@@ -16,7 +16,6 @@ env:
 
 jobs:
   create-pull-request:
-    continue-on-error: true
     environment:
       name: workflow-bot
       url: ${{ steps.pull-request.outputs.url }}
