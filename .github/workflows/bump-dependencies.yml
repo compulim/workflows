@@ -63,6 +63,8 @@ jobs:
           git checkout -b $BRANCH_NAME
 
           echo branch-name=$BRANCH_NAME | tee --append $GITHUB_OUTPUT
+      - name: Generate CHANGELOG.md
+        uses: compulim/generate-bump-changelog-action@v0.0.1
       - name: Stage changes
         run: git add --all
       - name: Commit changes
