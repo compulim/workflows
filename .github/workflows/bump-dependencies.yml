@@ -89,7 +89,11 @@ jobs:
       - name: Commit CHANGELOG.md
         run: git commit --message "Add bump dependencies entry"
       - name: Push changes of CHANGELOG.md
-        run: git push
+        # Sleep for 5 seconds before push.
+        # If push immediately after previous push, GitHub will be bugged and not running checks on latest push.
+        run: |
+          sleep 5
+          git push
       - continue-on-error: true
         name: Build pull request body
         run: |
