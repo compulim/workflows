@@ -51,6 +51,8 @@ jobs:
           git checkout -b $BRANCH_NAME
 
           echo branch-name=$BRANCH_NAME | tee --append $GITHUB_OUTPUT
+      - name: Push empty branch
+        run: git push --set-upstream origin ${{ steps.branch.outputs.branch-name }}
       - continue-on-error: true
         env:
           GH_TOKEN: ${{ steps.generate-token.outputs.token }}
@@ -83,7 +85,7 @@ jobs:
       - name: Commit changes
         run: git commit --message "Bump dependencies"
       - name: Push changes
-        run: git push --set-upstream origin ${{ steps.branch.outputs.branch-name }}
+        run: git push
       - continue-on-error: true
         name: Build pull request body
         run: |
