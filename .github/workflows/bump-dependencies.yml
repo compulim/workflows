@@ -92,9 +92,11 @@ jobs:
       - continue-on-error: true
         name: Build pull request body
         run: |
-          echo -e "> Created in [workflow run ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).\n\n## Changelog\n\n### Changed\n\n" > /tmp/pull-request-body.txt
+          echo -e "> Created in [workflow run ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).\n\n## Changelog\n\n### Changed\n\n" | tee /tmp/pull-request-body.txt
 
-          printf "${{ steps.generate-changelog.outputs.change }}\n" >> /tmp/pull-request-body.txt
+          cat <<EOF
+          ${{ steps.generate-changelog.outputs.change }}
+          EOF | tee --append /tmp/pull-request-body.txt
 
           cat /tmp/pull-request-body.txt
       - continue-on-error: true
