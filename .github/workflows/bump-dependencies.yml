@@ -32,6 +32,8 @@ jobs:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.PRIVATE_KEY }}
       - uses: actions/checkout@main
+      - name: Validate CHANGELOG.md
+        run: npx --offline keep-a-changelog --latest-release
       - name: Configure user profile
         run: |
           git config user.email "${{ format('@{0}', github.actor) }}"
