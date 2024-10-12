@@ -1,3 +1,4 @@
 extends:
-  - ../../.eslintrc.react.yml
   - ../../.eslintrc.jest.yml
+  - ../../.eslintrc.react.yml
+  - ./.eslintrc.custom.yml
