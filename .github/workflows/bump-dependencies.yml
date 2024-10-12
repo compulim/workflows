@@ -33,7 +33,7 @@ jobs:
           private_key: ${{ secrets.PRIVATE_KEY }}
       - uses: actions/checkout@main
       - name: 'Sanity check: validate CHANGELOG.md'
-        run: npx --offline keep-a-changelog --latest-release
+        run: npx keep-a-changelog --latest-release
       - name: Configure user profile
         run: |
           git config user.email "${{ format('@{0}', github.actor) }}"
