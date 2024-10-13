@@ -2,18 +2,6 @@
   "files": [
     "./dist/"
   ],
-  "exports": {
-    ".": {
-      "import": {
-        "types": "./dist/$package-name.d.mts",
-        "default": "./dist/$package-name.mjs"
-      },
-      "require": {
-        "types": "./dist/$package-name.d.ts",
-        "default": "./dist/$package-name.js"
-      }
-    }
-  },
   "main": "./dist/$package-name.js",
   "typings": "./dist/$package-name.d.ts",
   "scripts": {
