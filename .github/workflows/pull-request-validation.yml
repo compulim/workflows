@@ -148,3 +148,7 @@ jobs:
       - name: Run integration tests
         run: npm test
         working-directory: integration-test
+      - if: ${{ failure() }}
+        name: Post-test cleanup if failed
+        run: npm run posttest
+        working-directory: integration-test
