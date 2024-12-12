@@ -48,6 +48,13 @@ jobs:
           path: ./template
           repository: compulim/workflows
 
+      - id: find-package-path
+        name: Find package path
+        run: |
+          path=$(find packages -name "package.json" -exec sh -c 'jq -e ".name == \"${{ inputs.package-name }}\"" {} > /dev/null && dirname {}' \;)
+          [ -z "$path" ] && exit 1
+          echo package-path=$path | tee --append $GITHUB_OUTPUT
+
       - name: Configure user profile
         run: |
           git config user.email "${{ format('@{0}', github.actor) }}"
@@ -65,11 +72,11 @@ jobs:
 
       - name: Update directory name
         run: |
-          cd ./template/scaffold/copy/packages/
-          mv \$package-name ${{ inputs.package-name }}
+          cd ./template/scaffold/copy/
+          mv ./packages/\$package-name ${{ steps.find-package-path.outputs.package-path }}
 
-          cd ../../merge/packages/
-          mv \$package-name ${{ inputs.package-name }}
+          cd ../../merge/
+          mv ./packages/\$package-name ${{ steps.find-package-path.outputs.package-path }}
 
       - name: Update content
         run: |
@@ -103,7 +110,7 @@ jobs:
 
             echo
           done
-        working-directory: ./template/scaffold/copy/packages/${{ inputs.package-name }}/
+        working-directory: ./template/scaffold/copy/${{ steps.find-package-path.outputs.package-path }}/
 
       - name: Copy scaffold
         run: rsync --recursive --verbose ./template/scaffold/copy/ ./current/
