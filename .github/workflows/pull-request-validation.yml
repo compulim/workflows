@@ -98,7 +98,7 @@ jobs:
         with:
           name: tarball-${{ inputs.switch }}
       - name: Extract tarball to root
-        run: tar -xvf ${{ inputs.package-name }}-*.tgz --strip-components=1
+        run: tar -xvf *.tgz --strip-components=1
       - name: 'Sanity check: has LICENSE'
         run: compgen -G LICENSE
       - name: 'Sanity check: has README.md'
