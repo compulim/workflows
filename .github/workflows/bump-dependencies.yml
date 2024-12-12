@@ -1,11 +1,7 @@
 name: Bump dependencies
 
 on:
-  workflow_call:
-    inputs:
-      package-name:
-        required: true
-        type: string
+  workflow_call: {}
 
 defaults:
   run:
