@@ -4,7 +4,7 @@ export default defineConfig([
   {
     dts: true,
     entry: {
-      '$package-name': './src/index.ts'
+      ['$package-name'.replace(/\//, '-')]: './src/index.ts'
     },
     format: ['cjs', 'esm'],
     sourcemap: true
