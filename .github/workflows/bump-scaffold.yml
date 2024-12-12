@@ -15,6 +15,11 @@ on:
         default: false
         description: Skip integration test
         type: boolean
+    secrets:
+      APP_ID:
+        required: true
+      PRIVATE_KEY:
+        required: true
 
 defaults:
   run:
