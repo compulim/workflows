@@ -9,6 +9,13 @@ on:
       tag:
         required: true
         type: string
+    secrets:
+      APP_ID:
+        required: true
+      NPM_TOKEN:
+        required: true
+      PRIVATE_KEY:
+        required: true
 
 defaults:
   run:
