@@ -49,6 +49,12 @@ jobs:
         run: cat ./package-lock.json | jq '.packages | with_entries(select(.value.link | not)) | with_entries(select(.value.resolved != null)) | with_entries(select(.value.resolved | startswith("https://registry.npmjs.org/") | not)) | if length > 0 then halt_error(1) else empty end'
       - name: 'Sanity check: validate CHANGELOG.md'
         run: npx keep-a-changelog --latest-release
+      - id: find-package-path
+        name: Find package path
+        run: |
+          node --eval="console.log(`echo package-path=${require('resolve-pkg')(process.argv[1]))}`" \
+            ${{ inputs.package-name }}) \
+            | tee --append $GITHUB_OUTPUT
       - run: npm clean-install
       - if: inputs.switch && inputs.switch != 'current'
         name: Use switch "${{ inputs.switch }}"
@@ -56,12 +62,12 @@ jobs:
       - run: npm run build --if-present
       - name: Run npm pack
         run: npm pack
-        working-directory: packages/${{ inputs.package-name }}
+        working-directory: packages/${{ steps.find-package-path.outputs.package-path }}
       - name: Upload tarball artifact
         uses: actions/upload-artifact@main
         with:
           name: tarball-${{ inputs.switch }}
-          path: packages/${{ inputs.package-name }}/*.tgz
+          path: packages/${{ steps.find-package-path.outputs.package-path }}/*.tgz
       - if: inputs.github-pages
         name: Build and test pages
         run: |
@@ -80,7 +86,7 @@ jobs:
           path: packages/pages/public
       - name: Run unit tests
         run: npm test
-        working-directory: packages/${{ inputs.package-name }}
+        working-directory: packages/${{ steps.find-package-path.outputs.package-path }}
 
   sanity-check:
     needs: build
