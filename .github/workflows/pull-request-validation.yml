@@ -52,9 +52,9 @@ jobs:
       - id: find-package-path
         name: Find package path
         run: |
-          echo package-path=$(node --eval="console.log(require('resolve-pkg')(process.argv[1]) || '')") \
-            ${{ inputs.package-name }} \
-            | tee --append $GITHUB_OUTPUT
+          path=$(find packages -name "package.json" -exec sh -c 'jq -e ".name == \"${{ inputs.package-name }}\"" {} > /dev/null && dirname {}' \;)
+          [ -z "$path" ] exit 1
+          echo package-path=$path | tee --append $GITHUB_OUTPUT
       - run: npm clean-install
       - if: inputs.switch && inputs.switch != 'current'
         name: Use switch "${{ inputs.switch }}"
