@@ -62,12 +62,12 @@ jobs:
       - run: npm run build --if-present
       - name: Run npm pack
         run: npm pack
-        working-directory: packages/${{ steps.find-package-path.outputs.package-path }}
+        working-directory: ${{ steps.find-package-path.outputs.package-path }}
       - name: Upload tarball artifact
         uses: actions/upload-artifact@main
         with:
           name: tarball-${{ inputs.switch }}
-          path: packages/${{ steps.find-package-path.outputs.package-path }}/*.tgz
+          path: ${{ steps.find-package-path.outputs.package-path }}/*.tgz
       - if: inputs.github-pages
         name: Build and test pages
         run: |
@@ -86,7 +86,7 @@ jobs:
           path: packages/pages/public
       - name: Run unit tests
         run: npm test
-        working-directory: packages/${{ steps.find-package-path.outputs.package-path }}
+        working-directory: ${{ steps.find-package-path.outputs.package-path }}
 
   sanity-check:
     needs: build
