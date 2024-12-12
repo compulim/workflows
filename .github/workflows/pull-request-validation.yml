@@ -53,7 +53,7 @@ jobs:
         name: Find package path
         run: |
           path=$(find packages -name "package.json" -exec sh -c 'jq -e ".name == \"${{ inputs.package-name }}\"" {} > /dev/null && dirname {}' \;)
-          [ -z "$path" ] exit 1
+          [ -z "$path" ] && exit 1
           echo package-path=$path | tee --append $GITHUB_OUTPUT
       - run: npm clean-install
       - if: inputs.switch && inputs.switch != 'current'
