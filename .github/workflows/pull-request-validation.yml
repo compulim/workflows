@@ -52,7 +52,7 @@ jobs:
       - id: find-package-path
         name: Find package path
         run: |
-          node --eval="console.log(`echo package-path=${require('resolve-pkg')(process.argv[1]))}`)" \
+          node --eval="console.log(`echo package-path=${require('resolve-pkg')(process.argv[1]) || ''}`)" \
             ${{ inputs.package-name }} \
             | tee --append $GITHUB_OUTPUT
       - run: npm clean-install
