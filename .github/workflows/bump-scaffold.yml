@@ -92,6 +92,9 @@ jobs:
             sed -- 's/$package-name/${{ inputs.package-name }}/g' $i | tee /tmp/output.tmp
             mv /tmp/output.tmp $i
 
+            sed -- s/\$package-local-name/$(basename "${{ inputs.package-name }}")/g $i | tee /tmp/output.tmp
+            mv /tmp/output.tmp $i
+
             sed -- 's/$skip-integration-test/${{ inputs.skip-integration-test }}/g' $i | tee /tmp/output.tmp
             mv /tmp/output.tmp $i
 
