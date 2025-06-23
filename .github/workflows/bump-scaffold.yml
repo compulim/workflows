@@ -56,9 +56,10 @@ jobs:
       - id: find-package-path
         name: Find package path
         run: |
-          path=$(find ./current/packages -name "package.json" -exec sh -c 'jq -e ".name == \"${{ inputs.package-name }}\"" {} > /dev/null && dirname {}' \;)
+          path=$(find packages -name "package.json" -exec sh -c 'jq -e ".name == \"${{ inputs.package-name }}\"" {} > /dev/null && dirname {}' \;)
           [ -z "$path" ] && exit 1
           echo package-path=$path | tee --append $GITHUB_OUTPUT
+        working-directory: ./current
 
       - name: Configure user profile
         run: |
@@ -80,7 +81,7 @@ jobs:
           cd ./template/scaffold/copy/
           mv ./packages/\$package-name ${{ steps.find-package-path.outputs.package-path }}
 
-          cd ../../merge/
+          cd ../merge/
           mv ./packages/\$package-name ${{ steps.find-package-path.outputs.package-path }}
 
       - name: Update content
