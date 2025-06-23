@@ -134,7 +134,7 @@ jobs:
 
             if [[ -f ../../../current/$i ]]
             then
-              cat ../../../current/$i | jq --argfile merge $i '. + $merge' | tee /tmp/temp.json
+              cat ../../../current/$i | jq --slurpfile merge $i '. + $merge[0]' | tee /tmp/temp.json
               mv /tmp/temp.json ../../../current/$i
             fi
 
