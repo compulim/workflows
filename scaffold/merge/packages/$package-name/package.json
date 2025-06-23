@@ -1,4 +1,8 @@
 {
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/compulim/$package-local-name.git"
+  },
   "files": [
     "./dist/"
   ],
