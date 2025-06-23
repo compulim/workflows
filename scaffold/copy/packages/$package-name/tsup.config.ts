@@ -4,9 +4,10 @@ export default defineConfig([
   {
     dts: true,
     entry: {
-      ['$package-local-name']: './src/index.ts'
+      ['$package-local-name'.split('/').reverse()[0]]: './src/index.ts'
     },
     format: ['cjs', 'esm'],
-    sourcemap: true
+    sourcemap: true,
+    target: 'esnext'
   }
 ]);
