@@ -85,12 +85,16 @@ jobs:
         uses: actions/upload-pages-artifact@main
         with:
           path: packages/pages/public
+      # Moving to "npm sbom" to generate SBOM.
+      # - name: Generate SBOM
+      #   uses: anchore/sbom-action@v0
+      #   with:
+      #     output-file: sbom.spdx.json
+      #     upload-artifact: false
+      #     upload-release-assets: false
       - name: Generate SBOM
-        uses: anchore/sbom-action@v0
-        with:
-          output-file: sbom.spdx.json
-          upload-artifact: false
-          upload-release-assets: false
+        # --workspace has no effect
+        run: npm sbom -package-lock-only --sbom-format spdx --sbom-type library | tee ./sbom.spdx.json
       - name: Upload SBOM artifact
         uses: actions/upload-artifact@main
         with:
