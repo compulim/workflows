@@ -65,9 +65,10 @@ jobs:
       - name: Propagate versions
         run: npm install --workspaces ${{ inputs.package-name }}@${{ steps.version.outputs.version }}
       - run: npm clean-install
-      - run: npm run build --if-present
+      - name: Run npm run build
+        run: npm run build --if-present --no-ignore-scripts
       - name: Run npm pack
-        run: npm pack
+        run: npm pack --no-ignore-scripts
         working-directory: ${{ steps.find-package-path.outputs.package-path }}
       - name: Upload tarball artifact
         uses: actions/upload-artifact@main
@@ -78,7 +79,7 @@ jobs:
         name: Build pages
         run: |
           npm install ../../${{ steps.find-package-path.outputs.package-path }}/*.tgz
-          npm run build
+          npm run build --no-ignore-scripts
         working-directory: packages/pages
       - if: inputs.github-pages
         name: Upload pages artifact
