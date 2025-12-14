@@ -206,7 +206,7 @@ jobs:
         name: Create release
         # Do not upload assets while creating release, otherwise, it will not trigger "release created" event.
         run: |
-          if [[ '${{ needs.build.outputs.version-type }}' == 'prerelease' ]]; then PRERELEASE=1; fi
+          if [[ "${{ needs.build.outputs.version-type }}" == "prerelease" ]]; then PRERELEASE=1; fi
 
           TAG=v${{ needs.build.outputs.version }}
 
