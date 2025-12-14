@@ -86,21 +86,24 @@ jobs:
 
       - name: Update content
         run: |
+          PACKAGE_NAME='${{ inputs.package-name }}'
+          PACKAGE_LOCAL_NAME=$(basename "${{ inputs.package-name }}")
+
           for i in $(find -type f)
           do
             echo --- $i
 
-            sed -- 's/$package-name/${{ inputs.package-name }}/g' $i | tee /tmp/output.tmp
-            mv /tmp/output.tmp $i
+            perl -pe "s/\\\$package-name/\Q$PACKAGE_NAME\E/g" "$i" > /tmp/output.tmp
+            mv /tmp/output.tmp "$i"
 
-            sed -- s/\$package-local-name/$(basename "${{ inputs.package-name }}")/g $i | tee /tmp/output.tmp
-            mv /tmp/output.tmp $i
+            perl -pe "s/\\\$package-local-name/\Q$PACKAGE_LOCAL_NAME\E/g" "$i" > /tmp/output.tmp
+            mv /tmp/output.tmp "$i"
 
             sed -- 's/$skip-integration-test/${{ inputs.skip-integration-test }}/g' $i | tee /tmp/output.tmp
-            mv /tmp/output.tmp $i
+            mv /tmp/output.tmp "$i"
 
             sed -- 's/$use-react/${{ inputs.use-react }}/g' $i | tee /tmp/output.tmp
-            mv /tmp/output.tmp $i
+            mv /tmp/output.tmp "$i"
             echo
           done
         working-directory: ./template/scaffold/
