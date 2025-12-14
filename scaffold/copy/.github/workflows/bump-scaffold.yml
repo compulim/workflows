@@ -1,4 +1,4 @@
-name: Bump scaffold
+name: 🚀 Bump scaffold
 
 on:
   workflow_dispatch:
