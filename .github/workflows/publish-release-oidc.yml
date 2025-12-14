@@ -10,9 +10,9 @@ on:
         required: true
         type: string
     secrets:
-      APP_ID:
+      WORKFLOW_BOT_APP_ID:
         required: true
-      PRIVATE_KEY:
+      WORKFLOW_BOT_PRIVATE_KEY:
         required: true
 
 defaults:
@@ -81,13 +81,34 @@ jobs:
             --access public \
             $(ls -1 ./*.tgz)
 
+  # Isolate third-party scripts.
+  update-change-log:
+    # Only update CHANGELOG.md after publish to NPM production succeed.
+    if: needs.publish-package.outputs.version-type == 'production'
+    needs: publish-package
+    permissions:
+      contents: read
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@main
+      - name: Update CHANGELOG.md with new unreleased section
+        run: npx keep-a-changelog --create --format markdownlint
+      - name: Upload changelog artifact
+        uses: actions/upload-artifact@main
+        with:
+          name: changelog
+          path: CHANGELOG.md
+
   create-pull-request:
+    # Always review what is being added in this job, make sure no third-party scripts is included.
     environment:
       name: workflow-bot
       url: ${{ github.server_url }}/${{ github.repository }}/pull/${{ steps.pull-request.outputs.pull-request-number }}
-    # Only create pull request after publish to NPM succeed.
+    # Only create pull request after publish to NPM production succeed.
     if: needs.publish-package.outputs.version-type == 'production'
-    needs: publish-package
+    needs:
+      - publish-package
+      - update-change-log
     permissions:
       contents: write
     runs-on: ubuntu-latest
@@ -96,8 +117,8 @@ jobs:
         name: Generate token for workflow-bot
         uses: compulim/tibdex-github-app-token@v2.1.0
         with:
-          app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.PRIVATE_KEY }}
+          app_id: ${{ secrets.WORKFLOW_BOT_APP_ID }}
+          private_key: ${{ secrets.WORKFLOW_BOT_PRIVATE_KEY }}
       - uses: actions/checkout@main
       - name: Configure user profile
         run: |
@@ -112,6 +133,9 @@ jobs:
         run: |
           npm version prepatch --no-git-tag-version
           echo version=$(cat package.json | jq -r .version) | tee --append $GITHUB_OUTPUT
+      - uses: actions/download-artifact@main
+        with:
+          name: changelog
       - name: Create branch
         id: branch
         run: |
