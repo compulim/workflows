@@ -54,7 +54,7 @@ jobs:
           PACKAGE_NAME=$(cat /tmp/package.json | jq -r .name)
           VERSION=$(cat /tmp/package.json | jq -r .version)
 
-          PRERELEASE_NAME=$(echo $VERSION | cut -d- -f2 | cut -d. -f1)
+          PRERELEASE_NAME=$(echo $VERSION | cut -d- -f2 -s | cut -d. -f1)
 
           echo package-name=$PACKAGE_NAME | tee --append $GITHUB_OUTPUT
           echo prerelease-name=$PRERELEASE_NAME | tee --append $GITHUB_OUTPUT
