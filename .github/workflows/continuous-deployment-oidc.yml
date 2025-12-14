@@ -51,6 +51,7 @@ jobs:
           node-version: ${{ env.node-version }}
           cache: npm
       - if: steps.version-type.outputs.version-type != 'production'
+        name: Set version
         run: |
           BRANCH_NAME=${{ github.ref_name }}
           COMMITISH=${{ github.sha }}
