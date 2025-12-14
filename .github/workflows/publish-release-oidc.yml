@@ -25,8 +25,11 @@ env:
 jobs:
   publish-package:
     environment:
-      name: npm-production
+      name: npm
       url: https://npmjs.com/package/${{ steps.package-json.outputs.package-name }}/v/${{ steps.package-json.outputs.version }}
+    outputs:
+      version: ${{ steps.package-json.outputs.version }}
+      version-type: ${{ steps.package-json.outputs.version-type }}
     permissions:
       contents: read
       id-token: write
@@ -49,10 +52,9 @@ jobs:
 
           echo package-name=$(cat /tmp/package.json | jq -r .name) | tee --append $GITHUB_OUTPUT
           echo version=$(cat /tmp/package.json | jq -r .version) | tee --append $GITHUB_OUTPUT
+          if [[ "$(cat ./package.json | jq -r ''.version'')" == *-0 ]]; then echo version-type=prerelease | tee --append $GITHUB_OUTPUT; else echo version-type=production | tee --append $GITHUB_OUTPUT; fi
       - name: 'Sanity check: must package name of "${{ inputs.package-name }}"'
         run: '[[ "${{ steps.package-json.outputs.package-name }}" == "${{ inputs.package-name }}" ]]'
-      - name: 'Sanity check: must not be prerelease'
-        run: '[[ "${{ steps.package-json.outputs.version }}" != *-* ]]'
       - run: npm publish --access public $(ls ./*.tgz)
 
   create-pull-request:
@@ -60,6 +62,7 @@ jobs:
       name: workflow-bot
       url: ${{ github.server_url }}/${{ github.repository }}/pull/${{ steps.pull-request.outputs.pull-request-number }}
     # Only create pull request after publish to NPM succeed.
+    if: needs.publish-package.outputs.version-type == 'production'
     needs: publish-package
     permissions:
       contents: write
