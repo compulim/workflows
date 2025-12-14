@@ -1,0 +1,119 @@
+name: Publish release
+
+on:
+  workflow_call:
+    inputs:
+      package-name:
+        required: true
+        type: string
+      tag:
+        required: true
+        type: string
+    secrets:
+      APP_ID:
+        required: true
+      PRIVATE_KEY:
+        required: true
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  node-version: lts/*
+
+jobs:
+  publish-package:
+    environment:
+      name: npm-production
+      url: https://npmjs.com/package/${{ steps.package-json.outputs.package-name }}/v/${{ steps.package-json.outputs.version }}
+    permissions:
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@main
+        with:
+          node-version: ${{ env.node-version }}
+          registry-url: https://registry.npmjs.org/
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        name: Download assets
+        run: gh release download ${{ inputs.tag }} --repo ${{ github.repository }}
+      - name: "Sanity check: only one package to publish"
+        run: '[[ $(ls -1 ./*.tgz | wc -l) == 1 ]]'
+      - id: package-json
+        name: Read package.json
+        run: |
+          tar --extract --file=$(ls ./*.tgz) --to-stdout package/package.json | tee /tmp/package.json
+
+          echo package-name=$(cat /tmp/package.json | jq -r .name) | tee --append $GITHUB_OUTPUT
+          echo version=$(cat /tmp/package.json | jq -r .version) | tee --append $GITHUB_OUTPUT
+      - name: 'Sanity check: must package name of "${{ inputs.package-name }}"'
+        run: '[[ "${{ steps.package-json.outputs.package-name }}" == "${{ inputs.package-name }}" ]]'
+      - name: 'Sanity check: must not be prerelease'
+        run: '[[ "${{ steps.package-json.outputs.version }}" != *-* ]]'
+      - env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public $(ls ./*.tgz)
+
+  create-pull-request:
+    environment:
+      name: workflow-bot
+      url: ${{ github.server_url }}/${{ github.repository }}/pull/${{ steps.pull-request.outputs.pull-request-number }}
+    # Only create pull request after publish to NPM succeed.
+    needs: publish-package
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - id: generate-token
+        name: Generate token for workflow-bot
+        uses: compulim/tibdex-github-app-token@v2.1.0
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.PRIVATE_KEY }}
+      - uses: actions/checkout@main
+      - name: Configure user profile
+        run: |
+          git config user.email "${{ format('@{0}', github.actor) }}"
+          git config user.name "${{ format('@{0}', github.actor) }}"
+      - name: Use Node.js ${{ env.node-version }}
+        uses: actions/setup-node@main
+        with:
+          node-version: ${{ env.node-version }}
+          cache: npm
+      - id: version
+        run: |
+          npm version prepatch --no-git-tag-version
+          echo version=$(cat package.json | jq -r .version) | tee --append $GITHUB_OUTPUT
+      - name: Create branch
+        id: branch
+        run: |
+          BRANCH_NAME=bot/publish-release/${{ steps.version.outputs.version }}
+          echo branch-name=$BRANCH_NAME | tee --append $GITHUB_OUTPUT
+
+          git checkout -b $BRANCH_NAME
+      - name: Stage changes
+        run: git add --all --verbose
+      - name: Commit changes
+        run: git commit --message "v${{ steps.version.outputs.version }}"
+      - name: Push to branch
+        run: git push --set-upstream origin ${{ steps.branch.outputs.branch-name }}
+      - env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+        id: pull-request
+        name: Create pull request
+        run: |
+          gh api repos/${{ github.repository }}/pulls \
+            --field base=main \
+            --field body="> Created in [workflow run ${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})." \
+            --field head=${{ steps.branch.outputs.branch-name }} \
+            --field title="Bump to ${{ steps.version.outputs.version }}" \
+            | tee /tmp/pull-request.json
+          echo pull-request-number=$(cat /tmp/pull-request.json | jq -r '.number') | tee --append $GITHUB_OUTPUT
+      - continue-on-error: true
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+        name: Add label "release" to pull request ${{ steps.pull-request.outputs.pull-request-number }}
+        run: gh api repos/${{ github.repository }}/issues/${{ steps.pull-request.outputs.pull-request-number }}/labels --field labels[]=release
