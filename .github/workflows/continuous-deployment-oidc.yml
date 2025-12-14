@@ -51,8 +51,14 @@ jobs:
           node-version: ${{ env.node-version }}
           cache: npm
       - if: steps.version-type.outputs.version-type != 'production'
-        name: Run npx version-from-git --no-git-tag-version
-        run: npx version-from-git@main --no-git-tag-version
+        run: |
+          BRANCH_NAME=${{ github.ref_name }}
+          COMMITISH=${{ github.sha }}
+          NOW=$(date +%Y%m%d%H%M)
+
+          SHORT_COMMITISH=${COMMITISH:0:7}
+
+          npm version --no-git-tag-version $(echo $(cat ./package.json | jq -r '.version') | cut -d- -f1)-$BRANCH_NAME.$NOW.$SHORT_COMMITISH
       - id: version
         name: Get version
         run: echo version=$(cat package.json | jq -r '.version') | tee --append $GITHUB_OUTPUT
