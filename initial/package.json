@@ -1,5 +1,6 @@
 {
   "name": "$package-name-root",
+  "version": "0.1.0-0",
   "private": true,
   "scripts": {
     "build": "npm run build --if-present --workspaces",
