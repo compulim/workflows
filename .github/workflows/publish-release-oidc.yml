@@ -28,6 +28,7 @@ jobs:
       name: npm
       url: https://npmjs.com/package/${{ steps.package-json.outputs.package-name }}/v/${{ steps.package-json.outputs.version }}
     outputs:
+      prerelease-name: ${{ steps.package-json.outputs.prerelease-name }}
       version: ${{ steps.package-json.outputs.version }}
       version-type: ${{ steps.package-json.outputs.version-type }}
     permissions:
@@ -43,7 +44,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         name: Download assets
         run: gh release download ${{ inputs.tag }} --repo ${{ github.repository }}
-      - name: "Sanity check: only one package to publish"
+      - name: 'Sanity check: only one package to publish'
         run: '[[ $(ls -1 ./*.tgz | wc -l) == 1 ]]'
       - id: package-json
         name: Read package.json
@@ -52,10 +53,21 @@ jobs:
 
           echo package-name=$(cat /tmp/package.json | jq -r .name) | tee --append $GITHUB_OUTPUT
           echo version=$(cat /tmp/package.json | jq -r .version) | tee --append $GITHUB_OUTPUT
-          if [[ "$(cat ./package.json | jq -r ''.version'')" == *-0 ]]; then echo version-type=prerelease | tee --append $GITHUB_OUTPUT; else echo version-type=production | tee --append $GITHUB_OUTPUT; fi
+
+          if [[ "$(cat ./package.json | jq -r ''.version'')" == *-0 ]]; then (
+            echo prerelease-name=$(echo $version | cut -d- -f2 | cut -d. -f1) | tee --append $GITHUB_OUTPUT
+            echo version-type=prerelease | tee --append $GITHUB_OUTPUT
+          ) else (
+            echo version-type=production | tee --append $GITHUB_OUTPUT
+          ) fi
       - name: 'Sanity check: must package name of "${{ inputs.package-name }}"'
         run: '[[ "${{ steps.package-json.outputs.package-name }}" == "${{ inputs.package-name }}" ]]'
-      - run: npm publish --access public $(ls ./*.tgz)
+      - if: steps.package-json.outputs.version-type != 'production'
+        name: Publish as pre-release
+        run: npm publish --access public --tag ${{ steps.package-json.outputs.prerelease-name }} $(ls ./*.tgz)
+      - if: steps.package-json.outputs.version-type != 'prerelease'
+        name: Publish as production
+        run: npm publish --access public $(ls ./*.tgz)
 
   create-pull-request:
     environment:
