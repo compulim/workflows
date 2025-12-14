@@ -54,7 +54,7 @@ jobs:
           echo package-name=$(cat /tmp/package.json | jq -r .name) | tee --append $GITHUB_OUTPUT
           echo version=$(cat /tmp/package.json | jq -r .version) | tee --append $GITHUB_OUTPUT
 
-          if [[ "$(cat ./package.json | jq -r ''.version'')" == *-0 ]]; then (
+          if [[ "$(cat /tmp/package.json | jq -r ''.version'')" == *-0 ]]; then (
             echo prerelease-name=$(echo $version | cut -d- -f2 | cut -d. -f1) | tee --append $GITHUB_OUTPUT
             echo version-type=prerelease | tee --append $GITHUB_OUTPUT
           ) else (
@@ -64,10 +64,17 @@ jobs:
         run: '[[ "${{ steps.package-json.outputs.package-name }}" == "${{ inputs.package-name }}" ]]'
       - if: steps.package-json.outputs.version-type != 'production'
         name: Publish as pre-release
-        run: npm publish --access public --tag ${{ steps.package-json.outputs.prerelease-name }} $(ls ./*.tgz)
-      - if: steps.package-json.outputs.version-type != 'prerelease'
+        run: |
+          npm publish \
+            --access public \
+            --tag ${{ steps.package-json.outputs.prerelease-name }} \
+            $(ls -1 ./*.tgz)
+      - if: steps.package-json.outputs.version-type == 'production'
         name: Publish as production
-        run: npm publish --access public $(ls ./*.tgz)
+        run: |
+          npm publish \
+            --access public \
+            $(ls -1 ./*.tgz)
 
   create-pull-request:
     environment:
