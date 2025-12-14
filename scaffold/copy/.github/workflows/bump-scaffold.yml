@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       package-name:
-        default: $package-name
+        default: '$package-name'
         description: Name of the package
         required: true
         type: string
