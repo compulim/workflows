@@ -12,7 +12,18 @@
   },
   "license": "MIT",
   "author": "",
-  "type": "module",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/$package-local-name.d.mts",
+        "default": "./dist/$package-local-name.mjs"
+      },
+      "require": {
+        "types": "./dist/$package-local-name.d.ts",
+        "default": "./dist/$package-local-name.js"
+      }
+    }
+  },
   "main": "./dist/$package-local-name.js",
   "typings": "./dist/$package-local-name.d.ts",
   "files": [
@@ -23,6 +34,7 @@
     "bump": "npm run bump:prod && npm run bump:dev",
     "bump:dev": "PACKAGES_TO_BUMP=$(cat package.json | jq -r '(.pinDependencies // {}) as $P | (.localPeerDependencies // {}) as $L | (.devDependencies // {}) | to_entries | map(select(.key as $K | $L | has($K) | not)) | map(.key + \"@\" + ($P[.key] // [\"latest\"])[0]) | join(\" \")') && [ ! -z \"$PACKAGES_TO_BUMP\" ] && npm install $PACKAGES_TO_BUMP || true",
     "bump:prod": "PACKAGES_TO_BUMP=$(cat package.json | jq -r '(.pinDependencies // {}) as $P | (.localPeerDependencies // {}) as $L | (.dependencies // {}) | to_entries | map(select(.key as $K | $L | has($K) | not)) | map(.key + \"@\" + ($P[.key] // [\"latest\"])[0]) | join(\" \")') && [ ! -z \"$PACKAGES_TO_BUMP\" ] && npm install $PACKAGES_TO_BUMP || true",
+    "init": "npm install --save-dev @testduet/given-when-then @tsconfig/recommended @tsconfig/strictest @types/node esbuild escape-string-regexp expect prettier publint tsup typescript",
     "precommit": "npm run precommit:eslint && npm run precommit:publint && npm run precommit:typescript:production && npm run precommit:typescript:test",
     "precommit:eslint": "ESLINT_USE_FLAT_CONFIG=false eslint ./src/",
     "precommit:publint": "publint",
