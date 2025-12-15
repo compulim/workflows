@@ -4,6 +4,7 @@
     "url": "https://github.com/compulim/$package-local-name.git"
   },
   "files": [
+    "./*.js",
     "./dist/"
   ],
   "main": "./dist/$package-local-name.js",
