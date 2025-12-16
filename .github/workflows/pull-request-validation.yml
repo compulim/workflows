@@ -57,11 +57,10 @@ jobs:
           path=$(find packages -name "package.json" -exec sh -c 'jq -e ".name == \"${{ inputs.package-name }}\"" {} > /dev/null && dirname {}' \;)
           [ -z "$path" ] && exit 1
           echo package-path=$path | tee --append $GITHUB_OUTPUT
+          cat $path
       - name: 'Sanity check: repository.url must have correct owner'
         run: |
-          REPOSITORY_URL=$(cat package.json | jq -r '.repository.url')
-          echo $REPOSITORY_URL
-          [ "$REPOSITORY_URL" != "${{ github.server_url }}/${{ github.repository }}.git" ] && exit 1
+          [[ "$(cat package.json | jq -r '.repository.url')" == "${{ github.server_url }}/${{ github.repository }}.git" ]] || exit 1
         working-directory: ${{ steps.find-package-path.outputs.package-path }}
       - run: npm clean-install
       - if: inputs.switch && inputs.switch != 'current'
