@@ -57,7 +57,7 @@ jobs:
           path=$(find packages -name "package.json" -exec sh -c 'jq -e ".name == \"${{ inputs.package-name }}\"" {} > /dev/null && dirname {}' \;)
           [ -z "$path" ] && exit 1
           echo package-path=$path | tee --append $GITHUB_OUTPUT
-          cat $path
+          cat $path/package.json
       - name: 'Sanity check: repository.url must have correct owner'
         run: |
           [[ "$(cat package.json | jq -r '.repository.url')" == "${{ github.server_url }}/${{ github.repository }}.git" ]] || exit 1
