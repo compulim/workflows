@@ -9,9 +9,9 @@ on:
         required: true
         type: string
     secrets:
-      APP_ID:
+      WORKFLOW_BOT_APP_ID:
         required: true
-      PRIVATE_KEY:
+      WORKFLOW_BOT_PRIVATE_KEY:
         required: true
 
 defaults:
@@ -34,8 +34,8 @@ jobs:
         name: Generate token for workflow-bot
         uses: compulim/tibdex-github-app-token@v2.1.0
         with:
-          app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.PRIVATE_KEY }}
+          app_id: ${{ secrets.WORKFLOW_BOT_APP_ID }}
+          private_key: ${{ secrets.WORKFLOW_BOT_PRIVATE_KEY }}
       - uses: actions/checkout@main
       - name: Configure user profile
         run: |
