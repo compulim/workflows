@@ -60,7 +60,8 @@ jobs:
       - name: 'Sanity check: repository.url must have correct owner'
         run: |
           REPOSITORY_URL=$(cat package.json | jq '.repository.url')
-          [ $REPOSITORY_URL != "${{ github.server_url }}/${{ github.repository }}.git" ] && exit 1
+          echo $REPOSITORY_URL
+          [ "$REPOSITORY_URL" != "${{ github.server_url }}/${{ github.repository }}.git" ] && exit 1
         working-directory: ${{ steps.find-package-path.outputs.package-path }}
       - run: npm clean-install
       - if: inputs.switch && inputs.switch != 'current'
