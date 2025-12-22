@@ -150,7 +150,7 @@ jobs:
   publish-release:
     environment:
       name: workflow-bot
-      url: ${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ needs.build.outputs.version }}
+      url: ${{ github.server_url }}/${{ github.repository }}/releases/tag/v${{ needs.build.outputs.version }}
     # if: needs.build.outputs.version-type == 'production'
     name: Publish release
     needs:
