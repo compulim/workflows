@@ -160,10 +160,10 @@ jobs:
     steps:
       - id: generate-token
         name: Generate token for workflow-bot
-        uses: compulim/tibdex-github-app-token@v2.1.0
+        uses: actions/create-github-app-token@v2
         with:
-          app_id: ${{ secrets.WORKFLOW_BOT_APP_ID }}
-          private_key: ${{ secrets.WORKFLOW_BOT_PRIVATE_KEY }}
+          app-id: ${{ secrets.WORKFLOW_BOT_APP_ID }}
+          private-key: ${{ secrets.WORKFLOW_BOT_PRIVATE_KEY }}
       - continue-on-error: true # Partial changelog could be unavailable before first production release
         name: Download changelog artifact
         uses: actions/download-artifact@main
