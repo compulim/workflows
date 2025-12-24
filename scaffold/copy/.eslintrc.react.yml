@@ -4,3 +4,6 @@ extends:
 plugins:
   - react
   - react-hooks
+rules:
+  react-hooks/refs: off # We use refs intensively
+  react-hooks/preserve-manual-memoization: off # Does not know `valibot.parseProps`
