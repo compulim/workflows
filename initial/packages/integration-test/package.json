@@ -1,5 +1,5 @@
 {
-  "name": "$package-name-integration-test",
+  "name": "@compulim/$package-name-integration-test",
   "version": "0.0.0-0",
   "private": true,
   "description": "",
@@ -11,7 +11,7 @@
     "bump:dev": "PACKAGES_TO_BUMP=$(cat package.json | jq -r '(.pinDependencies // {}) as $P | (.localPeerDependencies // {}) as $L | (.devDependencies // {}) | to_entries | map(select(.key as $K | $L | has($K) | not)) | map(.key + \"@\" + ($P[.key] // [\"latest\"])[0]) | join(\" \")') && [ ! -z \"$PACKAGES_TO_BUMP\" ] && npm install $PACKAGES_TO_BUMP || true",
     "bump:prod": "PACKAGES_TO_BUMP=$(cat package.json | jq -r '(.pinDependencies // {}) as $P | (.localPeerDependencies // {}) as $L | (.dependencies // {}) | to_entries | map(select(.key as $K | $L | has($K) | not)) | map(.key + \"@\" + ($P[.key] // [\"latest\"])[0]) | join(\" \")') && [ ! -z \"$PACKAGES_TO_BUMP\" ] && npm install $PACKAGES_TO_BUMP || true",
     "docker": "docker compose up --quiet-pull --scale chromium=4",
-    "init": "npm install --save-dev @happy-dom/global-registrator @happy-dom/jest-environment @testduet/given-when-then @testduet/wait-for @tsconfig/strictest expect resolve-cwd typescript",
+    "init": "npm install --save-dev @tsconfig/strictest expect resolve-cwd typescript",
     "posttest": "if test \"$CI\" = \"true\"; then docker compose logs; docker compose down; fi",
     "precommit": "ESLINT_USE_FLAT_CONFIG=false eslint --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts ./",
     "pretest": "if test \"$CI\" = \"true\"; then npm run build; npm run docker -- --detach --wait; fi",
