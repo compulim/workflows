@@ -78,6 +78,15 @@ jobs:
                 end
               '
           done
+      - name: 'Sanity check: private package must be scoped'
+        # This is to prevent package squatting.
+        run: |
+          cat package.json | jq -r 'if (.private and (.name | startswith("@") | not)) then halt_error(1) else empty end'
+
+          for i in $(cat package.json | jq -r '.workspaces[]')
+          do
+            cat $i/package.json | jq -r 'if (.private and (.name | startswith("@") | not)) then halt_error(1) else empty end'
+          done
       - run: npm clean-install
       - if: inputs.switch && inputs.switch != 'current'
         name: Use switch "${{ inputs.switch }}"
