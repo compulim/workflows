@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/compulim/$package-local-name.git"
+    "url": "https://github.com/compulim/$package-local-name.git"
   },
   "license": "MIT",
   "author": "",
