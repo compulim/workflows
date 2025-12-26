@@ -1,8 +1,7 @@
 extends:
   - ./.eslintrc.custom.yml
 ignorePatterns:
-  - test/webDriver/**/dist/**
-  - test/webDriver/static/**
+  - webDriver/**
 overrides:
   - env:
       commonjs: true
