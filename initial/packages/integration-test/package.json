@@ -18,7 +18,20 @@
     "switch": "cat package.json | jq --arg SWITCH_NAME $SWITCH_NAME -r '(.[\"switch:\" + $SWITCH_NAME] // {}) as $TEMPLATE | .devDependencies += ($TEMPLATE.devDependencies // {}) | .dependencies += ($TEMPLATE.dependencies // {})' | tee ./package.json.tmp && mv ./package.json.tmp ./package.json",
     "test": "node --import ./happy-dom-env.ts --test ${CI:---watch} **/*.{spec,test}.{[jt]s,[jt]sx,c[jt]s,m[jt]s}"
   },
-  "pinDependencies": {},
+  "pinDependencies": {
+    "@testing-library/react": [
+      "15"
+    ],
+    "@types/react": [
+      "18"
+    ],
+    "react": [
+      "18"
+    ],
+    "react-test-renderer": [
+      "18"
+    ]
+  },
   "localPeerDependencies": {
     "$package-name": "0.0.0-0"
   },
