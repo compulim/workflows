@@ -1,7 +1,10 @@
 // This configuration file is for VSCode only.
 {
   "compilerOptions": {
-    "types": []
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "target": "esnext",
+    "types": ["node"]
   },
   "extends": "@tsconfig/strictest"
 }
