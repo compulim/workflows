@@ -117,7 +117,7 @@ jobs:
 
             if [[ -f ../../../../current/$i ]]
             then
-              cat ../../../../current/$i | jq --slurpfile merge $i '. + $merge[0]' | tee /tmp/temp.json
+              cat ../../../../current/$i | jq --slurpfile merge $i '. * $merge[0]' | tee /tmp/temp.json
               mv /tmp/temp.json ../../../../current/$i
             fi
 
@@ -140,7 +140,7 @@ jobs:
 
             if [[ -f ../../../../current/$i ]]
             then
-              cat ../../../../current/$i | jq --slurpfile merge $i '. + $merge[0]' | tee /tmp/temp.json
+              cat ../../../../current/$i | jq --slurpfile merge $i '. * $merge[0]' | tee /tmp/temp.json
               mv /tmp/temp.json ../../../../current/$i
             fi
 
@@ -152,7 +152,7 @@ jobs:
         name: Update configuration files
         run: |
           npm clean-install
-          npm run postscaffold
+          npm run postscaffold --if-present
         working-directory: ./current
 
       - id: get-changes
