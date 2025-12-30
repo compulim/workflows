@@ -129,9 +129,7 @@ jobs:
           name: github-pages-${{ inputs.switch }}
           path: packages/pages/public
       - name: Run unit tests
-        run: |
-          ls -laR
-          npm test --no-ignore-scripts
+        run: npm test --no-ignore-scripts
         working-directory: ${{ steps.find-package-path.outputs.package-path }}
 
   sanity-check:
