@@ -61,8 +61,7 @@
     }
   },
   "localPeerDependencies": {
-    "@compulim/test-harness": "0.0.0-0",
-    "$package-name": "0.0.0-0"
+    "@compulim/test-harness": "0.0.0-0"
   },
   "pinDependencies": {
     "@types/react": [
