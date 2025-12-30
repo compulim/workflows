@@ -11,6 +11,10 @@ on:
         default: true
         description: Use React
         type: boolean
+      skip-integration-test:
+        default: false
+        description: Skip integration test
+        type: boolean
     secrets:
       WORKFLOW_BOT_APP_ID:
         required: true
