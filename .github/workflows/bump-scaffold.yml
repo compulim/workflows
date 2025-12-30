@@ -84,7 +84,7 @@ jobs:
 
               cd ./template/scaffold/$i/$j/
               mv ./packages/\$package-name ${{ steps.find-package-path.outputs.package-path }}
-              cd ../../../
+              cd ../../../../
 
               echo
             done
