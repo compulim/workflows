@@ -1,8 +1,4 @@
 {
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/compulim/$package-local-name.git"
-  },
   "files": [
     "./*.js",
     "./dist/"
@@ -23,5 +19,64 @@
     "start": "npm run build -- --onSuccess \"touch ../pages/package.json\" --watch",
     "switch": "cat package.json | jq --arg SWITCH_NAME $SWITCH_NAME -r '(.[\"switch:\" + $SWITCH_NAME] // {}) as $TEMPLATE | .devDependencies += ($TEMPLATE.devDependencies // {}) | .dependencies += ($TEMPLATE.dependencies // {})' | tee ./package.json.tmp && mv ./package.json.tmp ./package.json",
     "test": "node --import ./happy-dom-env.ts --test ${CI:---watch} **/*.{spec,test}.{[jt]s,[jt]sx,c[jt]s,m[jt]s}"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/compulim/$package-local-name.git"
+  },
+  "bugs": {
+    "url": "https://github.com/compulim/$package-local-name/issues"
+  },
+  "homepage": "https://github.com/compulim/$package-local-name#readme",
+  "switch:react-16": {
+    "devDependencies": {
+      "@types/react": "^16",
+      "@types/react-dom": "^16",
+      "react": "16.8.0",
+      "react-dom": "16.8.0",
+      "react-test-renderer": "16.8.0"
+    }
+  },
+  "switch:react-17": {
+    "devDependencies": {
+      "@types/react": "^17",
+      "@types/react-dom": "^17",
+      "react": "17.0.0",
+      "react-dom": "17.0.0",
+      "react-test-renderer": "17.0.0"
+    }
+  },
+  "switch:react-18": {
+    "devDependencies": {
+      "@types/react": "^18",
+      "@types/react-dom": "^18",
+      "react": "18.0.0",
+      "react-dom": "18.0.0",
+      "react-test-renderer": "18.0.0"
+    }
+  },
+  "localPeerDependencies": {
+    "@compulim/test-harness": "0.0.0-0",
+    "$package-name": "0.0.0-0"
+  },
+  "pinDependencies": {
+    "@types/react": [
+      "18"
+    ],
+    "@types/react-dom": [
+      "18"
+    ],
+    "react": [
+      "18"
+    ],
+    "react-dom": [
+      "18"
+    ],
+    "react-test-renderer": [
+      "18"
+    ]
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0"
   }
 }
