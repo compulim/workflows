@@ -98,17 +98,11 @@ jobs:
         run: |
           npm pack --no-ignore-scripts
         working-directory: ${{ steps.find-package-path.outputs.package-path }}
-      - name: Run npm pack test-harness
-        run: |
-          npm pack --no-ignore-scripts
-        working-directory: packages/test-harness
       - name: Upload tarball artifact
         uses: actions/upload-artifact@main
         with:
           name: tarball-${{ inputs.switch }}
-          path: |
-            ${{ steps.find-package-path.outputs.package-path }}/*.tgz
-            packages/test-harness/*.tgz
+          path: ${{ steps.find-package-path.outputs.package-path }}/*.tgz
       - if: inputs.github-pages
         name: Build and test pages
         run: |
