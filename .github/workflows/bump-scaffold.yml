@@ -78,7 +78,7 @@ jobs:
 
       - name: Update directory names
         run: |
-          for i in current react; do
+          for i in common react; do
             for j in copy merge; do
               echo --- $i/$j
 
