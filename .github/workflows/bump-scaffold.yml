@@ -14,6 +14,7 @@ on:
       skip-integration-test:
         default: false
         description: Skip integration test
+        required: false
         type: boolean
     secrets:
       WORKFLOW_BOT_APP_ID:
