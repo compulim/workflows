@@ -1,0 +1,86 @@
+{
+  "exports": {
+    "./act": {
+      "import": {
+        "default": "./src/act.mjs",
+        "types": "./src/act.d.mts"
+      },
+      "require": {
+        "default": "./src/act.js",
+        "types": "./src/act.d.ts"
+      }
+    },
+    "./renderHook": {
+      "import": {
+        "default": "./src/renderHook.mjs",
+        "types": "./src/renderHook.d.mts"
+      },
+      "require": {
+        "default": "./src/renderHook.js",
+        "types": "./src/renderHook.d.ts"
+      }
+    }
+  },
+  "scripts": {
+    "init:dev": "npm install --save-dev @tsconfig/strictest @types/react@18 @types/react-dom@18 react@18 react-dom@18 react-test-renderer@18 resolve-cwd",
+    "init:prod": "npm install --save @happy-dom/global-registrator @testing-library/dom @testing-library/react escape-string-regexp expect typescript"
+  },
+  "switch:react-16": {
+    "dependencies": {
+      "@testing-library/react": "^12",
+      "@testing-library/react-hooks": "latest"
+    },
+    "devDependencies": {
+      "@types/react": "^16",
+      "@types/react-dom": "^16",
+      "react": "16.8.0",
+      "react-dom": "16.8.0",
+      "react-test-renderer": "16.8.0"
+    }
+  },
+  "switch:react-17": {
+    "dependencies": {
+      "@testing-library/react": "^12",
+      "@testing-library/react-hooks": "latest"
+    },
+    "devDependencies": {
+      "@types/react": "^17",
+      "@types/react-dom": "^17",
+      "react": "17.0.0",
+      "react-dom": "17.0.0",
+      "react-test-renderer": "17.0.0"
+    }
+  },
+  "switch:react-18": {
+    "dependencies": {},
+    "devDependencies": {
+      "@types/react": "^18",
+      "@types/react-dom": "^18",
+      "react": "18.0.0",
+      "react-dom": "18.0.0",
+      "react-test-renderer": "18.0.0"
+    }
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0",
+    "react-test-renderer": ">=16.8.0"
+  },
+  "pinDependencies": {
+    "@types/react": [
+      "18"
+    ],
+    "@types/react-dom": [
+      "18"
+    ],
+    "react": [
+      "18"
+    ],
+    "react-dom": [
+      "18"
+    ],
+    "react-test-renderer": [
+      "18"
+    ]
+  }
+}

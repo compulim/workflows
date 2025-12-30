@@ -1,0 +1,52 @@
+{
+  "scripts": {
+    "init:dev": "npm install --save--dev @compulim/test-harness@0.0.0-0 @tsconfig/recommended @tsconfig/strictest @types/node @types/react@18 @types/react-dom@18 escape-string-regexp expect publint react@18 react-dom@18 react-test-renderer@18 tsup typescript"
+  },
+  "switch:react-16": {
+    "devDependencies": {
+      "@types/react": "^16",
+      "@types/react-dom": "^16",
+      "react": "16.8.0",
+      "react-dom": "16.8.0",
+      "react-test-renderer": "16.8.0"
+    }
+  },
+  "switch:react-17": {
+    "devDependencies": {
+      "@types/react": "^17",
+      "@types/react-dom": "^17",
+      "react": "17.0.0",
+      "react-dom": "17.0.0",
+      "react-test-renderer": "17.0.0"
+    }
+  },
+  "switch:react-18": {
+    "devDependencies": {
+      "@types/react": "^18",
+      "@types/react-dom": "^18",
+      "react": "18.0.0",
+      "react-dom": "18.0.0",
+      "react-test-renderer": "18.0.0"
+    }
+  },
+  "pinDependencies": {
+    "@types/react": [
+      "18"
+    ],
+    "@types/react-dom": [
+      "18"
+    ],
+    "react": [
+      "18"
+    ],
+    "react-dom": [
+      "18"
+    ],
+    "react-test-renderer": [
+      "18"
+    ]
+  },
+    "peerDependencies": {
+    "react": ">=16.8.0"
+  }
+}

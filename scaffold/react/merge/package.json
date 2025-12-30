@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "postscaffold:eslint:react": "npm run bump:eslintrc",
+    "switch:react-16": "SWITCH_NAME=react-16 npm run switch:_",
+    "switch:react-17": "SWITCH_NAME=react-17 npm run switch:_",
+    "switch:react-18": "SWITCH_NAME=react-18 npm run switch:_"
+  }
+}

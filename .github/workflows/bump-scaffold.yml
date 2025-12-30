@@ -11,10 +11,6 @@ on:
         default: true
         description: Use React
         type: boolean
-      skip-integration-test:
-        default: false
-        description: Skip integration test
-        type: boolean
     secrets:
       WORKFLOW_BOT_APP_ID:
         required: true
@@ -76,13 +72,19 @@ jobs:
           echo branch-name=$BRANCH_NAME >> $GITHUB_OUTPUT
         working-directory: ./current/
 
-      - name: Update directory name
+      - name: Update directory names
         run: |
-          cd ./template/scaffold/copy/
-          mv ./packages/\$package-name ${{ steps.find-package-path.outputs.package-path }}
+          for i in current react; do
+            for j in copy merge; do
+              echo --- $i/$j
 
-          cd ../merge/
-          mv ./packages/\$package-name ${{ steps.find-package-path.outputs.package-path }}
+              cd ./template/scaffold/$i/$j/
+              mv ./packages/\$package-name ${{ steps.find-package-path.outputs.package-path }}
+              cd ../../../
+
+              echo
+            done
+          done
 
       - name: Update content
         run: |
@@ -92,33 +94,16 @@ jobs:
 
             sed -i "s|\$package-name|${{ inputs.package-name }}|g" "$i"
             sed -i "s|\$package-local-name|$(basename "${{ inputs.package-name }}")|g" "$i"
-            sed -i "s|\$skip-integration-test|${{ inputs.skip-integration-test }}|g" "$i"
             sed -i "s|\$use-react|${{ inputs.use-react }}|g" "$i"
 
             echo
           done
         working-directory: ./template/scaffold/
 
-      # - name: Remove React in Jest config
-      #   if: '!inputs.use-react'
-      #   run: |
-      #     # Remove @babel/preset-react from jest.config.json/transform
+      - name: Copy "common" scaffold
+        run: rsync --recursive --verbose ./template/scaffold/common/copy/ ./current/
 
-      #     for i in $(ls -1 jest.*.json)
-      #     do
-      #       echo --- $i
-
-      #       cat $i | jq -r '. | .transform |= with_entries(if ((.value | type == "array") and .value[0] == "babel-jest" and .value[1].presets) then . | (.value[1].presets |= map(select((. == "@babel/preset-react" or (. | type == "array" and .[0] == "@babel/preset-react") | not)))) else . end)' | tee /tmp/output.tmp
-      #       mv /tmp/output.tmp $i
-
-      #       echo
-      #     done
-      #   working-directory: ./template/scaffold/copy/${{ steps.find-package-path.outputs.package-path }}/
-
-      - name: Copy scaffold
-        run: rsync --recursive --verbose ./template/scaffold/copy/ ./current/
-
-      - name: Merge JSON
+      - name: Merge "common" scaffold
         run: |
           shopt -s globstar
 
@@ -126,15 +111,38 @@ jobs:
           do
             echo --- $i
 
-            if [[ -f ../../../current/$i ]]
+            if [[ -f ../../../../current/$i ]]
             then
-              cat ../../../current/$i | jq --slurpfile merge $i '. + $merge[0]' | tee /tmp/temp.json
-              mv /tmp/temp.json ../../../current/$i
+              cat ../../../../current/$i | jq --slurpfile merge $i '. + $merge[0]' | tee /tmp/temp.json
+              mv /tmp/temp.json ../../../../current/$i
             fi
 
             echo
           done
-        working-directory: ./template/scaffold/merge/
+        working-directory: ./template/scaffold/common/merge/
+
+      - if: inputs.use-react
+        name: Copy "react" scaffold
+        run: rsync --recursive --verbose ./template/scaffold/react/copy/ ./current/
+
+      - if: inputs.use-react
+        name: Merge "react" scaffold
+        run: |
+          shopt -s globstar
+
+          for i in $(find **/*.json -type f)
+          do
+            echo --- $i
+
+            if [[ -f ../../../../current/$i ]]
+            then
+              cat ../../../../current/$i | jq --slurpfile merge $i '. + $merge[0]' | tee /tmp/temp.json
+              mv /tmp/temp.json ../../../../current/$i
+            fi
+
+            echo
+          done
+        working-directory: ./template/scaffold/react/merge/
 
       - continue-on-error: true
         name: Update configuration files
