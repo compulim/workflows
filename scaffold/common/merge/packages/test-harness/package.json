@@ -7,6 +7,16 @@
     "./src/**/*"
   ],
   "exports": {
+    "./describeEach": {
+      "import": {
+        "types": "./src/describeEach.d.mts",
+        "default": "./src/describeEach.mjs"
+      },
+      "require": {
+        "types": "./src/describeEach.d.ts",
+        "default": "./src/describeEach.js"
+      }
+    },
     "./happy-dom.import": "./src/happy-dom.import.mjs",
     "./test-types.import": "./src/test-types.import.mjs"
   },
