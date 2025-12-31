@@ -105,6 +105,12 @@ jobs:
           done
         working-directory: ./template/scaffold/
 
+      - name: Create test-harness/package.json if not exists
+        run: |
+          mkdir -p ./test-harness/
+          [[ -f ./test-harness/package.json ]] || echo {} > ./test-harness/package.json
+        working-directory: ./current/packages/
+
       - name: Copy "common" scaffold
         run: rsync --recursive --verbose ./template/scaffold/common/copy/ ./current/
 
