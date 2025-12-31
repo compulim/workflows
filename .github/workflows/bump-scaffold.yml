@@ -105,12 +105,6 @@ jobs:
           done
         working-directory: ./template/scaffold/
 
-      - name: Create test-harness/package.json if not exists
-        run: |
-          mkdir -p ./test-harness/
-          [[ -f ./test-harness/package.json ]] || echo {} > ./test-harness/package.json
-        working-directory: ./current/packages/
-
       - name: Copy "common" scaffold
         run: rsync --recursive --verbose ./template/scaffold/common/copy/ ./current/
 
@@ -122,11 +116,11 @@ jobs:
           do
             echo --- $i
 
-            if [[ -f ../../../../current/$i ]]
-            then
-              cat ../../../../current/$i | jq --slurpfile merge $i '. * $merge[0]' | tee /tmp/temp.json
-              mv /tmp/temp.json ../../../../current/$i
-            fi
+            mkdir -p $(dirname ../../../../current/$i)
+            [[ -f ../../../../current/$i ]] || echo {} > ../../../../current/$i
+
+            cat ../../../../current/$i | jq --slurpfile merge $i '. * $merge[0]' | tee /tmp/temp.json
+            mv /tmp/temp.json ../../../../current/$i
 
             echo
           done
@@ -145,11 +139,11 @@ jobs:
           do
             echo --- $i
 
-            if [[ -f ../../../../current/$i ]]
-            then
-              cat ../../../../current/$i | jq --slurpfile merge $i '. * $merge[0]' | tee /tmp/temp.json
-              mv /tmp/temp.json ../../../../current/$i
-            fi
+            mkdir -p $(dirname ../../../../current/$i)
+            [[ -f ../../../../current/$i ]] || echo {} > ../../../../current/$i
+
+            cat ../../../../current/$i | jq --slurpfile merge $i '. * $merge[0]' | tee /tmp/temp.json
+            mv /tmp/temp.json ../../../../current/$i
 
             echo
           done
