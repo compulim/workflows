@@ -1,7 +1,7 @@
 import { describe } from 'node:test';
 import { format } from 'util';
 
-export function describeEach(rows) {
+function describe_(describe, rows) {
   return (
     /** @type {string} */
     message,
@@ -14,3 +14,13 @@ export function describeEach(rows) {
     }
   };
 }
+
+function describeEach(rows) {
+  describe_(describe, rows);
+}
+
+describeEach.only = function only(rows) {
+  describe_(describe.only, rows);
+};
+
+export { describeEach };
