@@ -117,10 +117,14 @@ jobs:
             echo --- $i
 
             mkdir -p $(dirname ../../../../current/$i)
-            [[ -f ../../../../current/$i ]] || echo {} > ../../../../current/$i
 
-            cat ../../../../current/$i | jq --slurpfile merge $i '. * $merge[0]' | tee /tmp/temp.json
-            mv /tmp/temp.json ../../../../current/$i
+            if [[ -f ../../../../current/$i ]]
+            then
+              cat ../../../../current/$i | jq --slurpfile merge $i '. * $merge[0]' | tee /tmp/temp.json
+              mv /tmp/temp.json ../../../../current/$i
+            else
+              cp $i ../../../../current/$i
+            fi
 
             echo
           done
@@ -140,10 +144,14 @@ jobs:
             echo --- $i
 
             mkdir -p $(dirname ../../../../current/$i)
-            [[ -f ../../../../current/$i ]] || echo {} > ../../../../current/$i
 
-            cat ../../../../current/$i | jq --slurpfile merge $i '. * $merge[0]' | tee /tmp/temp.json
-            mv /tmp/temp.json ../../../../current/$i
+            if [[ -f ../../../../current/$i ]]
+            then
+              cat ../../../../current/$i | jq --slurpfile merge $i '. * $merge[0]' | tee /tmp/temp.json
+              mv /tmp/temp.json ../../../../current/$i
+            else
+              cp $i ../../../../current/$i
+            fi
 
             echo
           done
