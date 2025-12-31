@@ -10,6 +10,7 @@
         "types": "./src/act.d.ts"
       }
     },
+    "./jsx.import": "./src/jsx.import.mjs",
     "./renderHook": {
       "import": {
         "default": "./src/renderHook.mjs",
@@ -23,7 +24,7 @@
   },
   "scripts": {
     "init:dev": "npm install --save-dev @tsconfig/strictest @types/react@18 @types/react-dom@18 react@18 react-dom@18 react-test-renderer@18 resolve-cwd",
-    "init:prod": "npm install --save @happy-dom/global-registrator @testing-library/dom @testing-library/react escape-string-regexp expect typescript"
+    "init:prod": "npm install --save @happy-dom/global-registrator @testing-library/dom @testing-library/react esbuild escape-string-regexp expect typescript"
   },
   "switch:react-16": {
     "dependencies": {
