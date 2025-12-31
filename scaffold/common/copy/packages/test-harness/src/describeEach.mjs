@@ -16,11 +16,11 @@ function describe_(describe, rows) {
 }
 
 function describeEach(rows) {
-  describe_(describe, rows);
+  return describe_(describe, rows);
 }
 
 describeEach.only = function only(rows) {
-  describe_(describe.only, rows);
+  return describe_(describe.only, rows);
 };
 
 export { describeEach };
