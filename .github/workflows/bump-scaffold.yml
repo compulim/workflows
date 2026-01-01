@@ -120,7 +120,22 @@ jobs:
 
             if [[ -f ../../../../current/$i ]]
             then
-              cat ../../../../current/$i | jq --slurpfile merge $i '. * $merge[0]' | tee /tmp/temp.json
+              cat ../../../../current/$i | jq --slurpfile merge $i '
+                def sort_keys: . | to_entries | sort_by(.key) | from_entries;
+                . * $merge[0] |
+                . + {
+                  author: .author // "William Wong (https://github.com/compulim)",
+                  dependencies: .dependencies | sort_keys,
+                  devDependencies: .devDependencies | sort_keys,
+                  exports: .exports | sort_keys,
+                  license: .license // "MIT",
+                  localPeerDependencies: .localPeerDependencies | sort_keys,
+                  pinDependencies: .pinDependencies | sort_keys,
+                  peerDependencies: .peerDependencies | sort_keys,
+                  scripts: .scripts | sort_keys
+                }
+              ' | tee /tmp/temp.json
+
               mv /tmp/temp.json ../../../../current/$i
             else
               cp $i ../../../../current/$i
