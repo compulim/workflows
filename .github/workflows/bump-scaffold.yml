@@ -125,14 +125,14 @@ jobs:
                 . * $merge[0] |
                 . + {
                   author: (.author // "William Wong (https://github.com/compulim)"),
-                  dependencies: .dependencies | sort_keys,
-                  devDependencies: .devDependencies | sort_keys,
-                  exports: .exports | sort_keys,
+                  dependencies: (.dependencies // {}) | sort_keys,
+                  devDependencies: (.devDependencies // {}) | sort_keys,
+                  exports: (.exports // {}) | sort_keys,
                   license: (.license // "MIT"),
-                  localPeerDependencies: .localPeerDependencies | sort_keys,
-                  pinDependencies: .pinDependencies | sort_keys,
-                  peerDependencies: .peerDependencies | sort_keys,
-                  scripts: .scripts | sort_keys
+                  localPeerDependencies: (.localPeerDependencies // {}) | sort_keys,
+                  pinDependencies: (.pinDependencies // {}) | sort_keys,
+                  peerDependencies: (.peerDependencies // {}) | sort_keys,
+                  scripts: (.scripts // {}) | sort_keys
                 }
               ' | tee /tmp/temp.json
 
