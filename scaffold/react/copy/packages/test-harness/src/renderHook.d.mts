@@ -4,6 +4,6 @@ declare type RenderHookResult<T = any, P = {}> = {
 };
 
 declare const cleanup: () => void;
-declare const renderHook: <T, P>(render: (props: P) => T, options?: { initialProps: P }) => RenderHookResult;
+declare const renderHook: <T, P>(render: (props: P) => T, options?: { initialProps: P }) => RenderHookResult<T, P>;
 
 export { cleanup, renderHook, type RenderHookResult };
