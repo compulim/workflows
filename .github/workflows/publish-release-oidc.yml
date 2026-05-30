@@ -92,7 +92,7 @@ jobs:
     steps:
       - uses: actions/checkout@main
       - name: Update CHANGELOG.md with new unreleased section
-        run: npx keep-a-changelog --create --format markdownlint
+        run: npx keep-a-changelog@2 --create --format markdownlint
       - name: Upload changelog artifact
         uses: actions/upload-artifact@main
         with:

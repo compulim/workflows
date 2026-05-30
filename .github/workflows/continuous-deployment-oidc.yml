@@ -135,12 +135,14 @@ jobs:
       - uses: actions/checkout@main
       - if: needs.build.outputs.version-type == 'production'
         name: Extract from latest release
-        run: npx keep-a-changelog --format markdownlint --latest-release-full | tee ./CHANGELOG.latest.md
+        run: npx keep-a-changelog@2 --format markdownlint --latest-release-full | tee ./CHANGELOG.latest.md
       - if: needs.build.outputs.version-type != 'production'
         name: Extract from unreleased
+        # There is a bug in `keep-a-changelog@3.0.4` that does not support "--release 1.2.3".
+        # Temporarily using `keep-a-changelog@2` until we found a solution.
         run: |
-          npx keep-a-changelog --format markdownlint --release ${{ needs.build.outputs.version }}
-          npx keep-a-changelog --format markdownlint --latest-release-full | tee ./CHANGELOG.latest.md
+          npx keep-a-changelog@2 --format markdownlint --release ${{ needs.build.outputs.version }}
+          npx keep-a-changelog@2 --format markdownlint --latest-release-full | tee ./CHANGELOG.latest.md
       - name: Upload changelog
         uses: actions/upload-artifact@main
         with:
