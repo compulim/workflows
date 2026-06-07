@@ -103,6 +103,15 @@ jobs:
         with:
           name: tarball-${{ inputs.switch }}
           path: ${{ steps.find-package-path.outputs.package-path }}/*.tgz
+      - name: Run npm pack common
+        run: |
+          npm pack --no-ignore-scripts
+        working-directory: packages/common
+      - name: Upload common tarball artifact
+        uses: actions/upload-artifact@main
+        with:
+          name: common-tarball-${{ inputs.switch }}
+          path: packages/common/*.tgz
       - name: Run npm pack test-harness
         run: |
           npm pack --no-ignore-scripts
@@ -191,6 +200,11 @@ jobs:
         uses: actions/download-artifact@main
         with:
           name: tarball-${{ inputs.switch }}
+          path: ./integration-test/
+      - name: Download common tarball artifact
+        uses: actions/download-artifact@main
+        with:
+          name: common-tarball-${{ inputs.switch }}
           path: ./integration-test/
       - name: Download test-harness tarball artifact
         uses: actions/download-artifact@main
