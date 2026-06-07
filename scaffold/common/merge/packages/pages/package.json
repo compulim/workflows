@@ -32,6 +32,7 @@
     ]
   },
   "localPeerDependencies": {
+    "@compulim/common": "0.0.0-0",
     "$package-name": "0.0.0-0"
   }
 }

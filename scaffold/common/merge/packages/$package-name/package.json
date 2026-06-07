@@ -34,6 +34,7 @@
   },
   "homepage": "https://github.com/compulim/$package-local-name#readme",
   "localPeerDependencies": {
+    "@compulim/common": "0.0.0-0",
     "@compulim/test-harness": "0.0.0-0"
   }
 }

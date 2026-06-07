@@ -4,6 +4,7 @@
   "author": "William Wong (https://github.com/compulim)",
   "license": "MIT",
   "workspaces": [
+    "packages/common",
     "packages/test-harness",
     "packages/$package-local-name",
     "packages/integration-test",

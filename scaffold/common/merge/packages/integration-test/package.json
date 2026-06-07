@@ -27,6 +27,7 @@
     "test:unit": "node --experimental-strip-types --experimental-test-coverage --experimental-test-isolation=none --test"
   },
   "localPeerDependencies": {
+    "@compulim/common": "0.0.0-0",
     "@compulim/test-harness": "0.0.0-0",
     "$package-name": "0.0.0-0"
   }
