@@ -1,0 +1,10 @@
+{
+  "name": "@compulim/common",
+  "version": "0.0.0-0",
+  "private": true,
+  "description": "",
+  "scripts": {
+    "init": "npm run init:dev --if-present && npm run init:prod --if-present",
+    "init:dev": "npm install @tsconfig/strictest"
+  }
+}
