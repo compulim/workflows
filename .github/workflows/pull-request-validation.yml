@@ -36,6 +36,8 @@ env:
 
 jobs:
   build:
+    outputs:
+      has-common: steps.pack-common.has-common == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -103,11 +105,18 @@ jobs:
         with:
           name: tarball-${{ inputs.switch }}
           path: ${{ steps.find-package-path.outputs.package-path }}/*.tgz
-      - name: Run npm pack common
+      - id: pack-common
+        name: Run npm pack common
         run: |
-          npm pack --no-ignore-scripts
-        working-directory: packages/common
+          if [ -d packages/common ]; then
+            cd packages/common
+            npm pack --no-ignore-scripts
+            echo has-common=true | tee --append $GITHUB_OUTPUT
+          else
+            echo has-common=false | tee --append $GITHUB_OUTPUT
+          fi
       - name: Upload common tarball artifact
+        if: steps.pack-common.outputs.has-common == 'true'
         uses: actions/upload-artifact@main
         with:
           name: common-tarball-${{ inputs.switch }}
@@ -202,6 +211,7 @@ jobs:
           name: tarball-${{ inputs.switch }}
           path: ./integration-test/
       - name: Download common tarball artifact
+        if: needs.build.outputs.has-common
         uses: actions/download-artifact@main
         with:
           name: common-tarball-${{ inputs.switch }}
