@@ -37,7 +37,7 @@ env:
 jobs:
   build:
     outputs:
-      has-common: steps.pack-common.outputs.has-common
+      has-common: ${{ steps.pack-common.outputs.has-common }}
     runs-on: ubuntu-latest
 
     steps:
