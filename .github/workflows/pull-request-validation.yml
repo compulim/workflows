@@ -37,7 +37,7 @@ env:
 jobs:
   build:
     outputs:
-      has-common: steps.pack-common.has-common
+      has-common: steps.pack-common.outputs.has-common
     runs-on: ubuntu-latest
 
     steps:
@@ -211,7 +211,7 @@ jobs:
           name: tarball-${{ inputs.switch }}
           path: ./integration-test/
       - name: Download common tarball artifact
-        if: needs.build.outputs.has-common == true
+        if: needs.build.outputs.has-common == 'true'
         uses: actions/download-artifact@main
         with:
           name: common-tarball-${{ inputs.switch }}
