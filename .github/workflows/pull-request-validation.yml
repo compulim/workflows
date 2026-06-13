@@ -211,7 +211,7 @@ jobs:
           name: tarball-${{ inputs.switch }}
           path: ./integration-test/
       - name: Download common tarball artifact
-        if: needs.build.outputs.has-common == 'true'
+        if: needs.build.outputs.has-common == true
         uses: actions/download-artifact@main
         with:
           name: common-tarball-${{ inputs.switch }}
