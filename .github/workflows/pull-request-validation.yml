@@ -194,7 +194,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - run: echo has-common=${{ needs.build.outputs.has-common }}
       - uses: actions/checkout@main
         with:
           path: ./repo
