@@ -2,6 +2,9 @@
   "name": "$package-name",
   "version": "0.0.0-0",
   "description": "",
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "./dist/$package-local-name.js",
   "typings": "./dist/$package-local-name.d.ts",
   "exports": {
