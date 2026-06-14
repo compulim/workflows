@@ -4,8 +4,6 @@
     "./*.js",
     "./dist/"
   ],
-  "main": "./dist/$package-local-name.js",
-  "typings": "./dist/$package-local-name.d.ts",
   "scripts": {
     "build": "tsup",
     "bump": "npm run bump:prod && npm run bump:dev",

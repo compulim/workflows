@@ -20,6 +20,8 @@
     "test": "npm run test --if-present --workspaces"
   },
   "workspaces": [
+    "packages/common",
+    "packages/test-harness",
     "packages/$package-local-name",
     "packages/pages",
     "packages/integration-test"

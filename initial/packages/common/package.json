@@ -3,6 +3,14 @@
   "version": "0.0.0-0",
   "private": true,
   "description": "",
+  "main": "./dist/index.js",
+  "typings": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
   "scripts": {
     "init": "npm run init:dev --if-present && npm run init:prod --if-present",
     "init:dev": "npm install @tsconfig/strictest"
