@@ -2,10 +2,5 @@
   "name": "@compulim/pages",
   "version": "0.0.0-0",
   "private": true,
-  "description": "",
-  "scripts": {
-    "init": "npm run init:dev && npm run init:prod",
-    "init:dev": "npm install --save-dev @compulim/common@0.0.0-0 @tsconfig/strictest @types/react @types/react-dom esbuild typescript",
-    "init:prod": "npm install --save $package-name@0.0.0-0 react react-dom"
-  }
+  "description": ""
 }

@@ -10,7 +10,7 @@
     "bump:dev": "PACKAGES_TO_BUMP=$(cat package.json | jq -r '(.pinDependencies // {}) as $P | (.localPeerDependencies // {}) as $L | (.devDependencies // {}) | to_entries | map(select(.key as $K | $L | has($K) | not)) | map(.key + \"@\" + ($P[.key] // [\"latest\"])[0]) | join(\" \")') && [ ! -z \"$PACKAGES_TO_BUMP\" ] && npm install $PACKAGES_TO_BUMP || true",
     "bump:prod": "PACKAGES_TO_BUMP=$(cat package.json | jq -r '(.pinDependencies // {}) as $P | (.localPeerDependencies // {}) as $L | (.dependencies // {}) | to_entries | map(select(.key as $K | $L | has($K) | not)) | map(.key + \"@\" + ($P[.key] // [\"latest\"])[0]) | join(\" \")') && [ ! -z \"$PACKAGES_TO_BUMP\" ] && npm install $PACKAGES_TO_BUMP || true",
     "postscaffold": "npm run postscaffold:dev --if-present && npm run postscaffold:prod --if-present",
-    "postscaffold:dev": "npm install --save-dev @compulim/test-harness@0.0.0-0 @tsconfig/recommended @tsconfig/strictest @types/node escape-string-regexp expect publint tsup typescript",
+    "postscaffold:dev": "npm install --save-dev @compulim/common@0.0.0-0 @compulim/test-harness@0.0.0-0 @happy-dom/global-registrator @testduet/given-when-then @tsconfig/recommended @tsconfig/strictest @types/node esbuild escape-string-regexp expect prettier publint tsup typescript",
     "precommit": "npm run precommit:eslint && npm run precommit:publint && npm run precommit:typescript:production && npm run precommit:typescript:test",
     "precommit:eslint": "ESLINT_USE_FLAT_CONFIG=false eslint ./src/",
     "precommit:publint": "publint",
