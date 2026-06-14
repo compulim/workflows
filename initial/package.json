@@ -1,5 +1,5 @@
 {
-  "name": "@compulim/$package-name-root",
+  "name": "@compulim/root",
   "version": "0.1.0-0",
   "private": true,
   "scripts": {
