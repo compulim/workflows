@@ -172,8 +172,7 @@ jobs:
           done
         working-directory: ./template/scaffold/react/merge/
 
-      - continue-on-error: true
-        name: Update configuration files
+      - name: Run npm run postscaffold
         run: |
           npm clean-install
           npm run postscaffold --if-present
