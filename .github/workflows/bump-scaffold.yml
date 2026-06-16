@@ -175,7 +175,7 @@ jobs:
       - continue-on-error: true
         name: Update configuration files
         run: |
-          npm install
+          npm clean-install
           npm run postscaffold --if-present
         working-directory: ./current
 
