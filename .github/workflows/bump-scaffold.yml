@@ -99,6 +99,7 @@ jobs:
 
             sed -i "s|\$package-name|${{ inputs.package-name }}|g" "$i"
             sed -i "s|\$package-local-name|$(basename "${{ inputs.package-name }}")|g" "$i"
+            sed -i "s|\$package-org-name|$(dirname "${{ inputs.package-name }}")|g" "$i"
             sed -i "s|\$use-react|${{ inputs.use-react }}|g" "$i"
 
             echo
