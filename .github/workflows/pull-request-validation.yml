@@ -148,6 +148,7 @@ jobs:
           path: packages/pages/public
       - name: Run unit tests
         run: npm test --no-ignore-scripts
+        timeout-minutes: 30
         working-directory: ${{ steps.find-package-path.outputs.package-path }}
 
   sanity-check:
@@ -226,6 +227,7 @@ jobs:
         working-directory: integration-test
       - name: Run integration tests
         run: npm test --no-ignore-scripts
+        timeout-minutes: 30
         working-directory: integration-test
       - if: ${{ failure() }}
         name: Post-test cleanup on failure
