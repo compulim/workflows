@@ -9,5 +9,5 @@
     8000
   ],
   "remoteUser": "node",
-  "updateContentCommand": "npm clean-install"
+  "updateContentCommand": "npm clean-install || true"
 }
