@@ -25,7 +25,7 @@
     "bump:prod": "PACKAGES_TO_BUMP=$(cat package.json | jq -r '(.pinDependencies // {}) as $P | (.localPeerDependencies // {}) as $L | (.dependencies // {}) | to_entries | map(select(.key as $K | $L | has($K) | not)) | map(.key + \"@\" + ($P[.key] // [\"latest\"])[0]) | join(\" \")') && [ ! -z \"$PACKAGES_TO_BUMP\" ] && npm install $PACKAGES_TO_BUMP || true",
     "postscaffold": "npm run postscaffold:dev --if-present && npm run postscaffold:prod --if-present",
     "postscaffold:dev": "npm install --save-dev @tsconfig/strictest resolve-cwd",
-    "postscaffold:prod": "npm install --save @happy-dom/global-registrator escape-string-regexp expect typescript",
+    "postscaffold:prod": "npm install --save @happy-dom/global-registrator escape-string-regexp expect typescript@6",
     "precommit": "npm run precommit:eslint && npm run precommit:typescript",
     "precommit:eslint": "ESLINT_USE_FLAT_CONFIG=false eslint --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts ./",
     "precommit:typescript": "tsc --noEmit --project ./src/tsconfig.precommit.json",
