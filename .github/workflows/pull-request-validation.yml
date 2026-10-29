@@ -89,6 +89,8 @@ jobs:
           do
             cat $i/package.json | jq -r 'if (.private and (.name | startswith("@") | not)) then halt_error(1) else empty end'
           done
+      - name: 'Sanity check: must be able to generate SBOM and no incompatible dependencies'
+        run: npm sbom --package-lock-only --sbom-format spdx --sbom-type library
       - run: npm clean-install
       - if: inputs.switch && inputs.switch != 'current'
         name: Use switch "${{ inputs.switch }}"

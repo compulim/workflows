@@ -88,7 +88,7 @@ jobs:
           path: packages/pages/public
       - name: Generate SBOM
         # --workspace has no effect, the resulting SBOM still contains other packages in the workspace
-        run: npm sbom -package-lock-only --sbom-format spdx --sbom-type library | tee ./sbom.spdx.json
+        run: npm sbom --package-lock-only --sbom-format spdx --sbom-type library | tee ./sbom.spdx.json
       - name: Upload SBOM artifact
         uses: actions/upload-artifact@main
         with:
